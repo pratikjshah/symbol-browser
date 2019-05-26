@@ -1,4 +1,4 @@
-# 🔄 Sketch Symbol Browser
+# Sketch Symbol Browser
 
 <img src="https://raw.githubusercontent.com/pratikjshah/symbol-browser/master/art/symbol-browser-logo.png" alt="Sketch Symbol Browser" width="160" align="right" />
 
