@@ -1,0 +1,1152 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    *,:after,:before {
+    -webkit-user-select: none;
+    user-select: none
+}
+
+input,textarea {
+    -webkit-user-select: auto;
+    user-select: auto
+}
+
+html {
+    cursor: default
+}
+
+.svg-icon {
+    width: 24px;
+    height: 24px;
+    fill: currentColor
+}
+
+.zero-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 96px 0;
+    flex: 1 0 auto
+}
+
+.zero-state__text {
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--theme-color-fg-tertiary);
+    margin-top: 40px;
+    /*max-width: 400px;*/
+    text-align: center
+}
+
+.zero-state__text em {
+    font-style: normal;
+    font-weight: 500;
+    color: var(--theme-color-fg-primary)
+}
+
+.zero-state__link {
+    --color:var(--theme-color-button);display: flex;
+    align-items: center;
+    color: var(--color);
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 4px;
+    border: 0;
+    cursor: pointer;
+    outline: 0;
+    font-size: 14px;
+    line-height: 20px;
+    padding: 10px 16px;
+    color: var(--theme-color-button-fg);
+    background-color: var(--color);
+    margin-top: 24px
+}
+
+.zero-state__link .svg-icon:first-child:not(:last-child) {
+    margin-right: 4px
+}
+
+.zero-state__link .svg-icon:last-child:not(:first-child) {
+    margin-left: 4px
+}
+
+.zero-state__link:hover {
+    --color:var(--theme-color-button-hover)}
+
+.zero-state__link:active,.zero-state__link:focus {
+    --color:var(--theme-color-button-active)}
+
+[v-cloak] {
+    display: none!important
+}
+
+body,html {
+    height: 100%;
+    margin: 0;
+    -webkit-font-smoothing: antialiased
+}
+
+html {
+    box-sizing: border-box;
+    background: transparent;
+    font-family: -apple-system,BlinkMacSystemFont;
+    color: var(--theme-color-fg-secondary)
+}
+
+body {
+    --theme-color-bg:#fff;--theme-color-bg-level-2:#f5f5f5;--theme-color-bg-level-3:#e6e6e6;--theme-color-bg-floating-header:hsla(0,0%,100%,.85);--theme-color-fg-primary:rgba(0,0,0,.87);--theme-color-fg-secondary:rgba(0,0,0,.54);--theme-color-fg-tertiary:rgba(0,0,0,.38);--theme-color-thin-border:rgba(0,0,0,.12);--theme-color-accent:#3d5afe;--theme-color-button:#3d5afe;--theme-color-button-hover:#0a2ffe;--theme-color-button-active:#0121d4;--theme-color-button-fg:#fff;--theme-color-search:rgba(0,0,0,.12);--theme-color-search-active:rgba(0,0,0,.24);--theme-color-search-highlight:#fbbc04;--theme-gradient-fade-to-bg:linear-gradient(90deg,#fff 0%,hsla(0,0%,100%,.9) 30%,hsla(0,0%,100%,.67) 60%,hsla(0,0%,100%,.5) 75%,hsla(0,0%,100%,.33) 85%,hsla(0,0%,100%,0));background: var(--theme-color-bg);
+    display: flex;
+    flex-direction: column;
+    --side-margin:36px;--left-keyline:316px;--root-section-vert-padding:40px}
+
+body[is-dark-theme] {
+    --theme-color-bg:#202124;--theme-color-bg-level-2:#2e3034;--theme-color-bg-level-3:#383a3f;--theme-color-bg-floating-header:rgba(32,33,36,.75);--theme-color-fg-primary:#fff;--theme-color-fg-secondary:hsla(0,0%,100%,.7);--theme-color-fg-tertiary:hsla(0,0%,100%,.5);--theme-color-thin-border:hsla(0,0%,100%,.2);--theme-color-accent:#536dfe;--theme-color-button:#8698fe;--theme-color-button-hover:#9faefe;--theme-color-button-active:#b8c3ff;--theme-color-button-fg:#000;--theme-color-search:hsla(0,0%,100%,.2);--theme-color-search-active:hsla(0,0%,100%,.3);--theme-color-search-highlight:#f29900;--theme-gradient-fade-to-bg:linear-gradient(90deg,#202124 0%,rgba(32,33,36,.9) 30%,rgba(32,33,36,.67) 60%,rgba(32,33,36,.5) 75%,rgba(32,33,36,.33) 85%,rgba(32,33,36,0))}
+
+@media only screen and (max-width: 800px) {
+    body[ui-mode=palette] {
+        --side-margin:20px;
+        --left-keyline:256px}
+}
+
+.root {
+    display: flex;
+    flex-direction: column;
+    height: 100%
+}
+
+.header-area {
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    height: 48px;
+    padding: 0 var(--side-margin);
+    display: grid;
+    align-items: center;
+    z-index: 10;
+    box-shadow: 0 1px 0 var(--theme-color-thin-border);
+    background-color: var(--theme-color-bg-floating-header);
+    -webkit-backdrop-filter: blur(12px);
+    /*grid-template-columns: calc(var(--left-keyline) - var(--side-margin)) 1fr;*/
+    grid-template-columns: calc(var(--left-keyline) - var(--side-margin)) 1fr auto;
+}
+
+[ui-mode=palette] .header-area {
+    grid-template-columns: 1fr
+}
+
+.header-area__back-button {
+    color: var(--theme-color-fg-tertiary);
+    display: flex;
+    align-items: center;
+    justify-self: flex-start;
+    margin: 0 0 0 -20px;
+    padding: 0;
+    -webkit-appearance: none;
+    border: 0;
+    background-color: transparent;
+    outline: none;
+    font-size: 14px;
+    line-height: 20px
+}
+
+[ui-mode=palette] .header-area__back-button {
+    display: none
+}
+
+.header-area__back-button .svg-icon {
+    width: 16px;
+    height: 16px;
+    margin-left: -4px;
+    margin-right: 8px
+}
+
+.header-area__back-button:focus,.header-area__back-button:hover {
+    color: var(--theme-color-fg-primary)
+}
+
+.header-area__search-field-container {
+    position: relative;
+    height: 32px;
+    justify-self: flex-start;
+    width: 100%;
+    max-width: 320px;
+    margin-right: var(--side-margin)
+}
+
+[ui-mode=palette] .header-area__search-field-container {
+    justify-self: stretch
+}
+
+.header-area__search-field-container .svg-icon {
+    color: var(--theme-color-fg-secondary);
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none
+}
+
+.header-area__search-field {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    border-radius: 4px;
+    background-color: var(--theme-color-search);
+    color: var(--theme-color-fg-primary);
+    -webkit-appearance: none;
+    padding: 0 0 0 40px;
+    box-sizing: border-box;
+    font-size: 14px;
+    line-height: 20px
+}
+
+.header-area__search-field:focus {
+    background-color: var(--theme-color-search-active);
+    outline: 0
+}
+
+.header-area__search-field::placeholder {
+    color: var(--theme-color-fg-secondary)
+}
+
+.stickers-area {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    padding-top: 48px
+}
+
+.sticker-library-header {
+    padding: 16px var(--side-margin);
+    background-color: rgba(0,0,0,.04);
+    border-bottom: 1px solid var(--theme-color-thin-border);
+    display: flex;
+    align-items: center
+}
+
+.sticker-library-header__title-lockup {
+    display: flex;
+    flex-direction: column;
+    flex: 1
+}
+
+.sticker-library-header__icon {
+    background-size: cover;
+    border-radius: 4px;
+    width: 48px;
+    height: 48px;
+    margin-right: 8px
+}
+
+.sticker-library-header__title {
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 500;
+    color: var(--theme-color-fg-secondary)
+}
+
+.sticker-library-header__subtitle {
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--theme-color-fg-secondary)
+}
+
+.sticker-library-header__colors-area {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: -8px 0
+}
+
+.sticker-library-header__colors-added {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--theme-color-fg-tertiary)
+}
+
+.sticker-library-header__colors-added .svg-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 4px
+}
+
+.sticker-library-header__add-colors {
+    --color:var(--theme-color-button);display: flex;
+    align-items: center;
+    color: var(--color);
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 4px;
+    border: 0;
+    cursor: pointer;
+    outline: 0;
+    font-size: 12px;
+    line-height: 16px;
+    padding: 6px 12px;
+    background-color: transparent;
+    --color:var(--theme-color-fg-primary)}
+
+.sticker-library-header__add-colors .svg-icon {
+    width: 20px;
+    height: 20px
+}
+
+.sticker-library-header__add-colors .svg-icon:first-child:not(:last-child) {
+    margin-right: 4px
+}
+
+.sticker-library-header__add-colors .svg-icon:last-child:not(:first-child) {
+    margin-left: 4px
+}
+
+.sticker-library-header__add-colors:hover {
+    --color:var(--theme-color-button-hover)}
+
+.sticker-library-header__add-colors:active,.sticker-library-header__add-colors:focus {
+    --color:var(--theme-color-button-active)}
+
+.sticker-library-header__colors-preview {
+    display: flex;
+    flex-direction: row
+}
+
+.sticker-library-header__color {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    margin-left: 4px;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.12)
+}
+
+.sticker-library-header__color-more {
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--theme-color-fg-secondary);
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+    width: auto
+}
+
+.sticker-root-section {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    flex-shrink: 0;
+    padding: var(--root-section-vert-padding) 0 0;
+    border-bottom: 1px solid var(--theme-color-thin-border)
+}
+
+@media only screen and (max-width: 440px) {
+    .sticker-root-section {
+        flex-direction:column
+    }
+}
+
+.sticker-root-section:after {
+    content: "";
+    position: absolute;
+    left: calc(var(--left-keyline) - 60px);
+    top: 1px;
+    bottom: 1px;
+    width: 60px;
+    background-image: var(--theme-gradient-fade-to-bg)
+}
+
+@media only screen and (max-width: 440px) {
+    .sticker-root-section:after {
+        display:none
+    }
+}
+
+.sticker-root-section__meta {
+    z-index: 1;
+    align-self: flex-start;
+    position: sticky;
+    position: -webkit-sticky;
+    top: calc(var(--root-section-vert-padding) + 48px);
+    box-sizing: border-box;
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    width: var(--left-keyline);
+    padding: 0 40px var(--root-section-vert-padding) var(--side-margin)
+}
+
+@media only screen and (max-width: 440px) {
+    .sticker-root-section__meta {
+        position:relative;
+        top: unset
+    }
+}
+
+.sticker-root-section__overline {
+    font-size: 10px;
+    line-height: 16px;
+    color: var(--theme-color-fg-tertiary);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden
+}
+
+.sticker-root-section__title {
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 800;
+    color: var(--theme-color-fg-primary)
+}
+
+.sticker-root-section__description, .sticker-sub-section__description {
+    font-size: 13px;
+    line-height: 20px;
+    margin-top: 16px;
+    color: var(--theme-color-fg-secondary)
+}
+
+.sticker-sub-section__description {
+    margin-top: 0px;
+    margin-bottom: 16px;
+}
+
+.sticker-root-section__link {
+    --color:var(--theme-color-button);display: flex;
+    align-items: center;
+    color: var(--color);
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 4px;
+    border: 0;
+    cursor: pointer;
+    outline: 0;
+    font-size: 12px;
+    line-height: 16px;
+    padding: 6px 12px;
+    box-shadow: 0 0 0 1px var(--color) inset;
+    background-color: transparent;
+    align-self: flex-start;
+    margin-top: 8px
+}
+
+.sticker-root-section__link .svg-icon {
+    width: 20px;
+    height: 20px
+}
+
+.sticker-root-section__link .svg-icon:first-child:not(:last-child) {
+    margin-right: 4px
+}
+
+.sticker-root-section__link .svg-icon:last-child:not(:first-child) {
+    margin-left: 4px
+}
+
+.sticker-root-section__link:active,.sticker-root-section__link:focus,.sticker-root-section__link:hover {
+    color: var(--theme-color-button-fg);
+    background-color: var(--color)
+}
+
+.sticker-root-section__link:active,.sticker-root-section__link:focus {
+    --color:var(--theme-color-button-hover)}
+
+.sticker-root-section__content {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-width: 0
+}
+
+.sticker-root-section__content-row {
+    padding: 12px var(--side-margin) var(--root-section-vert-padding) 60px;
+    margin: -12px 0 0 -60px;
+    overflow-x: auto;
+    align-self: stretch;
+    display: flex;
+    flex-direction: row
+}
+
+@media only screen and (max-width: 440px) {
+    .sticker-root-section__content-row {
+        padding-left:var(--side-margin);
+        margin-left: 0
+    }
+}
+
+.sticker-root-section__content-row>* {
+    margin-right: 20px
+}
+
+.sticker-root-section__content-row>:last-child {
+    position: relative
+}
+
+.sticker-root-section__content-row>:last-child:after {
+    content: "";
+    position: absolute;
+    right: calc(-1 * var(--side-margin));
+    width: 1px;
+    height: 20px
+}
+
+.sticker-root-section[layout=flow] .sticker-root-section__content-row {
+    flex-flow: row wrap
+}
+
+.sticker-root-section[layout=flow] .sticker-root-section__content-row .sticker {
+    margin-bottom: 24px
+}
+
+.sticker-sub-section {
+    display: flex;
+    flex-direction: column;
+    margin-right: 48px
+}
+
+.sticker-sub-section__title {
+    font-size: 14px;
+    line-height: 20px;
+    margin-bottom: 16px;
+    color: var(--theme-color-fg-primary);
+    font-weight: 500
+}
+
+.sticker-sub-section .sticker+.sticker {
+    margin-top: 12px
+}
+
+.sticker-sub-section__content.has-background-color {
+    box-shadow: 0 0 0 1px var(--theme-color-thin-border) inset;
+    padding: 24px
+}
+
+.sticker-sub-section__content.is-hide-names .sticker__caption {
+    display: none
+}
+
+.sticker-sub-section[layout=row] .sticker-sub-section__content {
+    display: flex;
+    flex-direction: row
+}
+
+.sticker-sub-section[layout=row] .sticker-sub-section__content .sticker+.sticker {
+    margin-top: 0;
+    margin-left: 20px
+}
+
+.sticker {
+    display: flex;
+    flex-direction: column
+}
+
+.sticker:not([data-loaded]) .sticker__thumb-container {
+    background-color: var(--theme-color-bg-level-2)
+}
+
+.sticker:not([data-loaded]) .sticker__thumb {
+    opacity: 0
+}
+
+.sticker__thumb-container {
+    display: flex;
+    background-color: transparent;
+    transition: background-color .1s ease
+}
+
+.sticker__thumb {
+    object-fit: contain;
+    cursor: pointer;
+    background-color: transparent;
+    transition: transform .1s ease,opacity .1s ease;
+    opacity: 1
+}
+
+.sticker__thumb:hover {
+    opacity: .85;
+    transform: translateY(-2px)
+}
+
+.sticker__caption {
+    margin-top: 4px;
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--theme-color-fg-tertiary)
+}
+
+.sticker.has-background-color .sticker__thumb-container {
+    box-shadow: 0 0 0 1px var(--theme-color-thin-border) inset;
+    padding: 24px
+}
+
+.sticker.has-background-color .sticker__caption {
+    margin-top: 8px;
+    margin-bottom: 12px
+}
+
+.no-stickers .zero-state__image {
+    /*background-image: url(zero-state@2x.png);
+    background-size: cover;
+    background-position: 50% 50%;
+    width: 100%;
+    max-width: 748px;
+    height: 284px;*/
+    width: 100%;
+    height: 180px;
+    background-image: url(sketch-file-outlined.svg);
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+/*body[is-dark-theme] .no-stickers .zero-state__image {
+    background-image: url(zero-state-dark@2x.png);
+    max-width: 748px;
+    height: 284px
+}*/
+
+.search-empty {
+    display: none
+}
+
+.no-search-results .search-empty {
+    display: flex
+}
+
+.search-empty .zero-state__image {
+    /*background-image: url(no-results@2x.png);
+    background-size: cover;
+    background-position: 50% 50%;
+    width: 100%;
+    max-width: 514px;
+    height: 158px;*/
+    width: 100%;
+    height: 180px;
+    background-image: url(sketch-file-outlined.svg);
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+/*body[is-dark-theme] .search-empty .zero-state__image {
+    background-image: url(no-results-dark@2x.png);
+    max-width: 514px;
+    height: 158px
+}*/
+
+body.has-active-search [data-search-match=none] {
+    display: none
+}
+
+body.has-active-search [data-search-match=direct] [data-search-match=none] {
+    display: flex
+}
+
+body.has-active-search [data-search-match=direct]>.sticker__caption {
+    display: unset
+}
+
+.search-highlight {
+    background-color: var(--theme-color-search-highlight);
+    border-radius: 4px
+}
+
+.page-loading {
+    display: flex;
+    animation: page-load-appear .7s ease .2s;
+    animation-fill-mode: backwards
+}
+
+@keyframes page-load-appear {
+    0% {
+        opacity: 0
+    }
+
+    to {
+        opacity: 1
+    }
+}
+
+.page-loading .zero-state__image {
+    /*background-image: url(indexing@2x.png);*/
+    /*background-size: cover;*/
+    /*background-position: 50% 50%;*/
+    width: 100%;
+    max-width: 248px;
+    height: 166px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+}
+
+body[is-dark-theme] .page-loading .zero-state__image {
+    /*background-image: url(indexing-dark@2x.png);*/
+    max-width: 248px;
+    height: 166px
+}
+
+.page-loading__progressbar {
+    position: relative;
+    margin-top: 40px;
+    height: 4px;
+    width: 160px;
+    background-color: var(--theme-color-bg-level-3)
+}
+
+.page-loading__progress {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: calc(100% - 4px * 2);
+    height: 100%;
+    background-color: var(--theme-color-accent);
+    background: linear-gradient(-45deg, #FFC220, #00B968, var(--theme-color-accent));
+    background-size: 400% 400%;
+    -webkit-animation: Gradient 15s ease infinite;
+    -moz-animation: Gradient 15s ease infinite;
+    animation: Gradient 15s ease infinite;
+    transform-origin: 0 0;
+    transform: scaleX(0);
+    transition: transform .5s cubic-bezier(.25,.25,0,1)
+}
+
+@keyframes Gradient {
+    0% {
+        background-position: 0% 50%
+    }
+
+    50% {
+        background-position: 100% 50%
+    }
+
+    100% {
+        background-position: 0% 50%
+    }
+}
+
+.loader-container .box div.svg {
+    background-image: url(sketch-file.svg);
+    background-repeat: no-repeat;
+    background-position: left center;
+  background-size: 50px 60px;
+  margin: 16px;
+  height: 60px;
+  width: 50px;
+}
+
+.loader-container {
+    position: relative;
+    height: 120px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+}
+
+.loader-container .center {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+    width: 140px;
+    height: 140px;
+    border-radius: 100%;
+    /*background-color: #fff;*/
+    border: 9px solid var(--theme-color-thin-border);
+    overflow: hidden;
+}
+
+.loader-container .wrap {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: row;
+            flex-direction: row;
+}
+
+.loader-container span::before {
+    content: "";
+    position: absolute;
+    width: 48px;
+    height: 6px;
+    background-color: var(--theme-color-thin-border);
+    -webkit-transform: rotate(45deg);
+            transform: rotate(45deg);
+}
+
+.loader-container span::after {
+    content: "";
+    position: absolute;
+    left: 35px;
+    top: 25px;
+    width: 36px;
+    height: 12px;
+    background-color: var(--theme-color-thin-border);
+    -webkit-transform: rotate(45deg);
+            transform: rotate(45deg);
+    border-radius: 0 4px 4px 0;
+}
+
+.loader-container .box-1 {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+}
+
+.loader-container .box-2 {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+}
+
+/* animation */
+
+@-webkit-keyframes rowup-1 {
+    0% {
+        -webkit-transform: translate3d(0, 0, 0);
+                transform: translate3d(0, 0, 0);
+    }
+    100% {
+        -webkit-transform: translate3d(50%, 0, 0);
+                transform: translate3d(50%, 0, 0);
+    }
+}
+
+@keyframes rowup-1 {
+    0% {
+        -webkit-transform: translate3d(0, 0, 0);
+                transform: translate3d(0, 0, 0);
+    }
+    100% {
+        -webkit-transform: translate3d(50%, 0, 0);
+                transform: translate3d(50%, 0, 0);
+    }
+}
+
+@-webkit-keyframes rowup-2 {
+    0% {
+        -webkit-transform: translate3d(0, 0, 0);
+                transform: translate3d(0, 0, 0);
+    }
+    100% {
+        -webkit-transform: translate3d(50%, 0, 0);
+                transform: translate3d(50%, 0, 0);
+    }
+}
+
+@keyframes rowup-2 {
+    0% {
+        -webkit-transform: translate3d(0, 0, 0);
+                transform: translate3d(0, 0, 0);
+    }
+    100% {
+        -webkit-transform: translate3d(50%, 0, 0);
+                transform: translate3d(50%, 0, 0);
+    }
+}
+
+@-webkit-keyframes cloud-loop {
+    0% {
+        -webkit-transform: translate(0, 15px);
+        transform: translate(0, 15px);
+    }
+    100% {
+        -webkit-transform: translate(0, 0);
+        transform: translate(0, 0);
+    }
+}
+
+@-webkit-keyframes shadow-loop {
+    0% {
+        -webkit-transform: translate(0, -35px) scale(1.15, 0.25);
+        transform: translate(0, -35px) scale(1.15, 0.25);
+    }
+    100% {
+        -webkit-transform: translate(0, -35px) scale(1, 0.25);
+        transform: translate(0, -35px) scale(1, 0.25);
+    }
+}
+
+@keyframes shadow-loop {
+    0% {
+        -webkit-transform: translate(0, -35px) scale(1.15, 0.25);
+        transform: translate(0, -35px) scale(1.15, 0.25);
+    }
+    100% {
+        -webkit-transform: translate(0, -35px) scale(1, 0.25);
+        transform: translate(0, -35px) scale(1, 0.25);
+    }
+}
+
+.loader-container .box-1 {
+    -webkit-animation: 1s rowup-1 linear infinite normal;
+            animation: 1s rowup-1 linear infinite normal;
+}
+
+.loader-container .box-2 {
+    -webkit-animation: 1s rowup-2 linear infinite normal;
+            animation: 1s rowup-2 linear infinite normal;
+}
+
+.loader-container .center {
+    -webkit-animation-name: cloud-loop;
+    animation-name: cloud-loop;
+    -webkit-animation-duration: 0.7s;
+    animation-duration: 0.7s;
+    -webkit-animation-iteration-count: infinite;
+    animation-iteration-count: infinite;
+    -webkit-animation-timing-function: ease;
+    animation-timing-function: ease;
+    -webkit-animation-direction: alternate;
+    animation-direction: alternate;
+}
+
+.loader-container span {
+    position: relative;
+    left: 134px;
+    top: 65px;
+    -webkit-animation-name: cloud-loop;
+    animation-name: cloud-loop;
+    -webkit-animation-duration: 0.7s;
+    animation-duration: 0.7s;
+    -webkit-animation-iteration-count: infinite;
+    animation-iteration-count: infinite;
+    -webkit-animation-timing-function: ease;
+    animation-timing-function: ease;
+    -webkit-animation-direction: alternate;
+    animation-direction: alternate;
+}
+
+.element {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 80px;
+}
+.element:after {
+  -webkit-animation: changeLetter 2s linear infinite alternate;
+          animation: changeLetter 2s linear infinite alternate;
+  display: block;
+  content: "🤔";
+  font-size: 64px;
+}
+@-webkit-keyframes changeLetter {
+  0% {
+    content: "🤔";
+  }
+  100% {
+    content: "🤨";
+  }
+}
+@keyframes changeLetter {
+  0% {
+    content: "🤔";
+  }
+  100% {
+    content: "🤨";
+  }
+}
+
+  </style>
+</head>
+<body>
+  <div class="root" v-cloak>
+    <div class="header-area">
+      <button class="header-area__back-button" v-on:click="closeWindow">
+        <svg-icon glyph="arrow_back_ios"></svg-icon>
+        <span>Back to Sketch</span>
+      </button>
+      <div class="header-area__search-field-container" v-if="stickerIndex">
+        <svg-icon glyph="search"></svg-icon>
+        <input class="header-area__search-field"
+            v-model="$globals.searchText"
+            v-on:keydown="onSearchKeydown($event)"
+            v-on:input="onSearchInput($event)"
+            autocorrect="off"
+            spellcheck="false"
+            placeholder="Search for a sticker">
+      </div>
+      <div v-if="stickerIndex"><a class="sticker-root-section__link" 
+        href="http://symbol-browser.pratikshah.website/#faq"
+        style="margin-top: 0;">FAQs</a></div>
+    </div>
+
+    <div class="stickers-area" v-if="stickerIndex">
+      <div v-for="library in stickerIndex.libraries"
+          v-if="!library._hide"
+          class="sticker-library-container"
+          :key="library.id">
+        <div class="sticker-library-header">
+          <div class="sticker-library-header__icon" v-if="library.iconPath"
+              v-bind:style="{'background-image':'url(file://' + library.iconPath + ')'}"></div>
+          <div class="sticker-library-header__title-lockup">
+            <div class="sticker-library-header__title">{{ library.title }}</div>
+            <div class="sticker-library-header__subtitle" v-if="library.subtitle">{{ library.subtitle }}</div>
+          </div>
+          <div class="sticker-library-header__colors-area" v-if="library.colorsAvailable">
+            <span class="sticker-library-header__colors-added" v-if="library.colors && library.colorsAdded">
+              <svg-icon glyph="check"></svg-icon>
+              Library colors added
+            </span>
+            <button class="sticker-library-header__add-colors"
+                    v-if="library.colors && !library.colorsAdded"
+                    v-on:click="addLibraryColors(library)">
+              <svg-icon glyph="add_circle_outline"></svg-icon>
+              <span>Add library colors to document</span>
+            </button>
+            <div class="sticker-library-header__colors-preview" v-if="library.colors && !library.colorsAdded">
+              <div class="sticker-library-header__color" v-for="color in library.colors.slice(0, 3)"
+                  v-bind:style="{'background-color': color}"></div>
+              <div class="sticker-library-header__color sticker-library-header__color-more" v-if="library.colors.length > 3">
+                +{{ library.colors.length - 3 }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-for="section in library.sections"
+            v-if="!section._hide"
+            :key="section.id"
+            class="sticker-root-section"
+            v-bind:layout="section.layout || 'default'">
+          <div class="sticker-root-section__meta">
+            <div class="sticker-root-section__overline">{{ library.title }}</div>
+            <hilitext class="sticker-root-section__title sticker-root-section__hilitext" v-bind:text="section.title"></hilitext>
+            <hilitext class="sticker-root-section__description sticker-root-section__hilitext" v-bind:text="section.description"></hilitext>
+            <a target="_blank" class="sticker-root-section__link" v-for="link in section.links" v-bind:href="link.url">
+              {{ link.title }}
+            </a>
+          </div>
+          <div class="sticker-root-section__content">
+            <div class="sticker-root-section__content-row" v-for="row in section.rows" v-if="!row._hide">
+              <template v-for="item in row.items" v-if="!item._hide">
+                <div v-if="item.type == 'section'" v-bind:layout="item.layout || 'default'" class="sticker-sub-section">
+                  <!-- subsections treated as columns -->
+                  <hilitext class="sticker-sub-section__title sticker-sub-section__hilitext" v-bind:text="item.title"></hilitext>
+                  <hilitext class="sticker-sub-section__description sticker-sub-section__hilitext" v-bind:text="item.description"></hilitext>
+                  <div class="sticker-sub-section__content"
+                      v-bind:class="{
+                        'is-hide-names': item.hideNames,
+                        'has-background-color': !!item.background
+                      }"
+                      v-bind:style="{'background-color': item.background}">
+                    <sticker
+                        v-bind:parent-section="item"
+                        v-for="subItem in item.items"
+                        v-if="!subItem._hide"
+                        :key="subItem.id"
+                        v-bind:sticker="subItem"></sticker>
+                  </div>
+                </div>
+                <template v-if="item.type == 'layer'">
+                  <!-- individual sticker -->
+                  <sticker v-bind:parent-section="section" v-bind:sticker="item"></sticker>
+                </template>
+              </template>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="zero-state no-stickers" v-if="!$globals.searchText && !stickerIndex.libraries.length">
+        <div class="zero-state__image"><div class="element"></div></div>
+        <span class="zero-state__text">
+          You don't have any active Sketch libraries! Want to add one?
+        </span>
+        <a class="zero-state__link" href="https://www.sketch.com/docs/libraries/adding-libraries">Learn more</a>
+      </div>
+      <div class="zero-state search-empty" v-if="$globals.searchText">
+        <div class="zero-state__image"><div class="element"></div></div>
+        <span class="zero-state__text">
+          No symbols or categories matched <em>'{{ $globals.searchText }}'</em>
+        </span>
+      </div>
+    </div>
+
+    <div class="zero-state page-loading" v-if="!stickerIndex">
+      <div class="zero-state__image">
+          <div class="loader-container">
+            <span></span>
+            <div class="center">
+                <div class="wrap">
+                    <div class="box-1 box">
+                      <div class="svg"></div>
+                        <div class="svg"></div>
+                    </div>
+                    <div class="box-2 box">
+                        <div class="svg"></div>
+                        <div class="svg"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+      <span class="zero-state__text">
+        Indexing Library Symbols&hellip; 
+        <br/> <span style="font-size: 12px;">(this might take a minute)</span>
+      </span>
+      <div class="page-loading__progressbar">
+        <div class="page-loading__progress"
+            v-bind:style="{'transform':'scaleX(' + indexLoadProgress + ')'}"></div>
+      </div>
+    </div>
+  
+  </div>
+
+  <script type="text/x-template" id="sticker-template">
+    <div class="sticker"
+        v-bind:data-sticker-id="sticker.id"
+        v-bind:class="{
+          'has-background-color': !!parentSection.backgroundEach
+        }">
+      <div class="sticker__thumb-container"
+          v-bind:style="{
+            'background-color': parentSection.backgroundEach,
+            'width': drawSize.width + 'px',
+            'height': drawSize.height + 'px'
+          }"
+          v-bind:title="sticker.name">
+        <img class="sticker__thumb"
+            v-bind:width="drawSize.width"
+            v-bind:height="drawSize.height">
+      </div>
+      <hilitext class="sticker__caption sticker__hilitext" v-bind:text="sticker.name"></hilitext>
+    </div>
+  </script>
+
+  <script src="plugin-call.js"></script>
+  <script src="index.js"></script>
+
+</body>
+</html>

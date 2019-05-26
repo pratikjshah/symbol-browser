@@ -1,0 +1,113 @@
+/*
+ * Copyright 2018 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+$fontStackBody: -apple-system, BlinkMacSystemFont;
+
+@function make-soft-gradient-color-to-transparent($color) {
+  @return linear-gradient(to right,
+      rgba($color, 1.00) 0%,
+      rgba($color, 0.90) 30%,
+      rgba($color, 0.67) 60%,
+      rgba($color, 0.50) 75%,
+      rgba($color, 0.33) 85%,
+      rgba($color, 0.00) 100%);
+}
+
+@mixin theme-light {
+  $__bg: #fff;
+  $__accent: #3D5AFE;
+  --theme-color-bg: #{$__bg};
+  --theme-color-bg-level-2: #{darken($__bg, 4%)};
+  --theme-color-bg-level-3: #{darken($__bg, 10%)};
+  --theme-color-bg-floating-header: #{rgba($__bg, .85)};
+  --theme-color-fg-primary: #{rgba(#000, .87)};
+  --theme-color-fg-secondary: #{rgba(#000, .54)};
+  --theme-color-fg-tertiary: #{rgba(#000, .38)};
+  --theme-color-thin-border: #{rgba(#000, .12)};
+  --theme-color-accent: #{$__accent};
+  --theme-color-button: #{$__accent};
+  --theme-color-button-hover: #{darken($__accent, 10%)};
+  --theme-color-button-active: #{darken($__accent, 20%)};
+  --theme-color-button-fg: #fff;
+  --theme-color-search: #{rgba(#000, .12)};
+  --theme-color-search-active: #{rgba(#000, .24)};
+  --theme-color-search-highlight: #FBBC04;
+  --theme-gradient-fade-to-bg: #{make-soft-gradient-color-to-transparent($__bg)};
+}
+
+@mixin theme-dark {
+  $__bg: #202124;
+  $__accent: #202124;
+  --theme-color-bg: #{$__bg};
+  --theme-color-bg-level-2: #{lighten($__bg, 6%)};
+  --theme-color-bg-level-3: #{lighten($__bg, 10%)};
+  --theme-color-bg-floating-header: #{rgba($__bg, .75)};
+  --theme-color-fg-primary: #fff;
+  --theme-color-fg-secondary: #{rgba(#fff, .7)};
+  --theme-color-fg-tertiary: #{rgba(#fff, .5)};
+  --theme-color-thin-border: #{rgba(#fff, .2)};
+  --theme-color-accent: #{$__accent};
+  --theme-color-button: #{lighten($__accent, 10%)};
+  --theme-color-button-hover: #{lighten($__accent, 15%)};
+  --theme-color-button-active: #{lighten($__accent, 20%)};
+  --theme-color-button-fg: #000;
+  --theme-color-search: #{rgba(#fff, .2)};
+  --theme-color-search-active: #{rgba(#fff, .3)};
+  --theme-color-search-highlight: #F29900;//#EA8600;
+  --theme-gradient-fade-to-bg: #{make-soft-gradient-color-to-transparent($__bg)};
+}
+
+@mixin narrow {
+  @media only screen and (max-width: 440px) {
+    @content;
+  }
+}
+
+@mixin medium {
+  @media only screen and (max-width: 800px) {
+    @content;
+  }
+}
+
+@mixin type-headline-1 {
+  font-size: 20px;
+  line-height: 28px;
+}
+
+@mixin type-headline-2 {
+  font-size: 16px;
+  line-height: 24px;
+}
+
+@mixin type-body-1 {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+@mixin type-body-2 {
+  font-size: 13px;
+  line-height: 20px;
+}
+
+@mixin type-body-3 {
+  font-size: 12px;
+  line-height: 16px;
+}
+
+@mixin type-body-4 {
+  font-size: 10px;
+  line-height: 16px;
+}

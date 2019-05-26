@@ -1,0 +1,109 @@
+{
+  "name": " 🔄 Symbol Browser",
+  "description": "Better way to browse your Design System and UI Sticker sheet",
+  "icon": "symbol-browser.png",
+  "author": "Pratik Shah",
+  "email": "hello@pratikshah.website",
+  "appcast": "https://raw.githubusercontent.com/pratikjshah/symbol-browser/master/appcast.xml",
+  "updateURL": "https://github.com/pratikjshah/symbol-browser/archive/master.zip",
+  "downloadURL": "https://github.com/pratikjshah/symbol-browser/archive/master.zip",
+  "homepage": "http://symbol-browser.pratikshah.website/",
+  "version": "2.1.0",
+  "identifier": "website.pratikshah.symbol-browser",
+  "compatibleVersion": "52",
+  "bundleVersion": "1",
+  "commands": [
+    {
+      "script": "handler.js",
+      "handlers": {
+        "actions": {
+          "OpenDocument": "onOpenDocument"
+        }
+      },
+      "name": "onOpenDocument",
+      "identifier": "onOpenDocument"
+    },
+    {
+      "script": "commands.js",
+      "handlers": {
+        "run": "onShowStickers"
+      },
+      "name": "🔍 View Design System",
+      "shortcut": "cmd shift d",
+      "identifier": "show_stickers",
+      "description": "Show or hide Design System window.",
+      "icon": "icon-menu.png"
+    },
+    {
+      "script": "commands.js",
+      "handlers": {
+        "run": "onClearCache"
+      },
+      "name": "🧹 Clear Symbol Index",
+      "identifier": "clear_cache",
+      "description": "Clear the Symbol index for troubleshooting purposes.",
+      "icon": "icon-menu.png"
+    },
+    {
+      "script": "handler.js",
+      "handler": "openDocumentation",
+      "shortcut": "",
+      "name": "Syntax guide for Stickers",
+      "identifier": "openDocumentation",
+      "description": "View Symtax guide for adding Stickers",
+      "icon": "icon-menu.png"
+    },
+    {
+      "script": "handler.js",
+      "handler": "openSampleFile",
+      "shortcut": "",
+      "name": "Example Sketch Library",
+      "identifier": "openSampleFile",
+      "description": "Get Example Sketch Library and see what's possible!",
+      "icon": "icon-menu.png"
+    },
+    {
+      "script": "handler.js",
+      "handler": "reportIssue",
+      "shortcut": "",
+      "name": "Report issue",
+      "identifier": "reportIssue"
+    },
+    {
+      "script": "handler.js",
+      "handler": "checkForUpdate",
+      "shortcut": "",
+      "name": "Check for Plugin update",
+      "identifier": "checkForUpdate"
+    },
+    {
+      "script": "handler.js",
+      "handler": "aboutPratikShah",
+      "shortcut": "",
+      "name": "About Pratik Shah",
+      "identifier": "aboutPratikShah"
+    }
+  ],
+  "menu": {
+    "items": [
+      "show_stickers",
+      "-",
+      "openSampleFile",
+      "openDocumentation",
+      "-",
+      "clear_cache",
+      "-",
+      {
+        "title": "More",
+        "items": [
+          "reportIssue",
+          "checkForUpdate",
+          "-",
+          "aboutPratikShah"
+        ]
+      }
+    ],
+    "title": " 🔄 Symbol Browser"
+  },
+  "disableCocoaScriptPreprocessor": true
+}
