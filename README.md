@@ -35,7 +35,7 @@ This plugin lets you..
 
 #### Contributing
 
-Lots of room for improvement, let's build it together :) Report and [`issue`](https://github.com/pratikjshah/symbol-browser/issues) or request for an exciting [`feature`](https://github.com/pratikjshah/symbol-browser/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22).
+Lots of room for improvement, let's build it together. Report an [`issue`](https://github.com/pratikjshah/symbol-browser/issues) or request for an exciting [`feature`](https://github.com/pratikjshah/symbol-browser/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22).
 
 #### Credits and Acknowledgement
 
