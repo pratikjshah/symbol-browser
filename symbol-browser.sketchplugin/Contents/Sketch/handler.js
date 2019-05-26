@@ -1499,8 +1499,8 @@ function manageUpdate(remoteManifest, isDailyCheck) {
   /*if (userConfig.localVersion != remoteManifest.version) {
   	showMsg(userConfig.name + ": "+ userConfig.localVersion + " is out of date! Please check for updates.");
   }*/
-  if (remoteManifest.version) {
-    if (userConfig.localVersion == remoteManifest.version) {
+  if (remoteManifest.localVersion) {
+    if (userConfig.localVersion == remoteManifest.localVersion) {
       if (!isDailyCheck) {
         showMsg("🤘Yo🤘! You are using the latest version of " + userConfig.name);
       }
@@ -1534,7 +1534,7 @@ function showAvailableUpdateDialog() {
 
   if (response == "1000") {
     //globalContext.document.showMessage("Go to download");
-    openUrlInBrowser("https://github.com/pratikjshah/symbol-browser/archive/master.zip");
+    openUrlInBrowser("https://github.com/pratikjshah/symbol-browser/releases/latest/download/symbol-browser.sketchplugin.zip");
   } else {
     //globalContext.document.showMessage("Check later");
     setUpdateCheckDayOnTomorrow();
