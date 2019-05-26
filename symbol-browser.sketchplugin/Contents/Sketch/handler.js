@@ -1494,11 +1494,11 @@ function manageManualUpdate(remoteManifest) {
   manageUpdate(remoteManifest, isDailyCheck);
 }
 function manageUpdate(remoteManifest, isDailyCheck) {
-  console.log("userConfig.localVersion: " + userConfig.localVersion + "   |   remoteManifest.version: " + remoteManifest.version);
+  // console.log("userConfig.localVersion: "+ userConfig.localVersion + "   |   remoteManifest.version: " + remoteManifest.version);
+
   /*if (userConfig.localVersion != remoteManifest.version) {
   	showMsg(userConfig.name + ": "+ userConfig.localVersion + " is out of date! Please check for updates.");
   }*/
-
   if (remoteManifest.version) {
     if (userConfig.localVersion == remoteManifest.version) {
       if (!isDailyCheck) {
@@ -1584,7 +1584,7 @@ function readLocalData(path) {
   }
 }
 function networkRequest(url, callBackFun) {
-  console.log("in networkRequest: \n" + url + " \n " + callBackFun);
+  // console.log("in networkRequest: \n" + url + " \n " + callBackFun);
   return fetch(url).then(function (response) {
     if (!response.ok) {
       throw Error(response.statusText);
@@ -1594,17 +1594,15 @@ function networkRequest(url, callBackFun) {
   }).then(function (response) {
     return response.json();
   }).then(function (result) {
-    console.log('Response Params: \n url: ' + url + " \n callBackFun: " + callBackFun);
-    console.log(result);
-
+    // console.log('Response Params: \n url: ' + url + " \n callBackFun: " + callBackFun);
+    // console.log(result);
     if (callBackFun !== 'undefined') {
       callBackFun(result);
     }
 
     return result;
-  }).catch(function (error) {
-    console.log('Params: \n url: ' + url + " \n callBackFun: " + callBackFun);
-    console.log('Looks like there was a problem: \n', error);
+  }).catch(function (error) {// console.log('Params: \n url: ' + url + " \n callBackFun: " + callBackFun);
+    // console.log('Looks like there was a problem: \n', error);
   });
 }
 function trackEvent(action, label, value) {
