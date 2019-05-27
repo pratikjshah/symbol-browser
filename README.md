@@ -32,6 +32,8 @@ This plugin lets you..
 - Un-zip
 - Double-click on the `symbol-browser.sketchplugin`
 
+## What can you do with this plugin?
+<video src="https://github.com/pratikjshah/symbol-browser/blob/master/art/symbol-browser-features.mp4" controls preload></video>
 
 #### Contributing
 
