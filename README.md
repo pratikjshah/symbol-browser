@@ -21,8 +21,8 @@ This plugin lets you..
       Download
     </a>
     <span> | </span>
-    <a href="https://github.com/pratikjshah/symbol-browser/wiki">
-      Getting Started Docs
+    <a href="https://github.com/pratikjshah/symbol-browser/#faq">
+      Help and FAQs
     </a>
   </h4>
 </div>
@@ -38,6 +38,43 @@ This plugin lets you..
 <img src="https://raw.githubusercontent.com/pratikjshah/symbol-browser/master/art/symbol-browser-features.gif" alt="Symbol Browser Features image" width="100%" align="center" />
 
 <br/>
+
+## FAQ
+
+<details><summary><b>Why is it taking so long for indexing?</b></summary>
+<p>
+
+Time required to index your Sketch Library is directly proportional to the size and number of symbols it has. But don't worry! This is a one time activity. 
+
+*If you have suggestions on how can this be optimized, feel free to raise a pull request.*
+
+</p>
+</details>
+
+<details><summary><b>My Library symbol update is not reflecting in Symbol Browser!</b></summary>
+<p>
+
+The plugin checks for the Sketch Library modification time and keeps indexing the change when you Open a new document or add a new Sketch Library. 
+
+But in case you want to *force plugin to index again*, you can go to plugin menu and click `🧹 Clear Symbol Index` to remove cached symbols. So after this when you one the Symbol Browser, it will re-index Sketch Libraries.
+
+![🧹 Clear Symbol Index](https://github.com/pratikjshah/symbol-browser/blob/master/art/clear-symbol-index.png?raw=true "🧹 Clear Symbol Index")
+
+</p>
+</details>
+
+<details><summary><b>How is this plugin different from 'Stickers'?</b></summary>
+<p>
+
+**Symbol Browser** is a forked version of Roman Nurik's [Sticker](https://github.com/romannurik/Sketch-Stickers) project.
+  The goal of this sketch plugin is to provide additional features such as showing Sketch Library symbols along with the Stickers you have tagged.
+  
+</p>
+</details>
+
+<br/><br/>
+
+
 
 #### Contributing
 
