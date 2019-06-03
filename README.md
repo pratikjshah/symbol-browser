@@ -179,3 +179,15 @@ Lots of room for improvement, let's build it together. Report an [`issue`](https
 
 - Sketch [Developers API](https://developer.sketch.com/reference/api/)
 - Roman Nurik for [Stickers](https://github.com/romannurik/Sketch-Stickers)
+
+<br/>
+
+
+## About
+
+Symbol Browser is made by [Pratik Shah](http://pratikshah.website).
+
+- Website: [http://pratikshah.website](http://pratikshah.website)
+- Dribbble: [https://dribbble.com/pratikshah](https://dribbble.com/pratikshah)
+- LinkedIn: [https://in.linkedin.com/in/shahpratikj](https://in.linkedin.com/in/shahpratikj)
+- Email: [hello@pratikshah.website](hello@pratikshah.website)
