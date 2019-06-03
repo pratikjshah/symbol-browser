@@ -15,6 +15,14 @@ This plugin lets you..
 [![GitHub Download Count](https://github-basic-badges.herokuapp.com/downloads/pratikjshah/symbol-browser/total.svg)]()
 [![GitHub License](https://github-basic-badges.herokuapp.com/license/pratikjshah/symbol-browser.svg)]()
 
+## Installation Guide
+- [⬇️Download](https://github.com/pratikjshah/symbol-browser/releases/latest/download/symbol-browser.sketchplugin.zip) the latest release of the plugin
+- Un-zip
+- Double-click on the `symbol-browser.sketchplugin`
+
+<br/>
+
+## Important links
 <div>
   <h4>
     <a href="https://github.com/pratikjshah/symbol-browser/releases/latest/download/symbol-browser.sketchplugin.zip">
@@ -24,13 +32,12 @@ This plugin lets you..
     <a href="https://github.com/pratikjshah/symbol-browser/#faq">
       Help and FAQs
     </a>
+    <span> | </span>
+    <a href="https://github.com/pratikjshah/symbol-browser/wiki/Cheat-sheet-for-Stickers">
+      Cheatsheet for Stickers
+    </a>
   </h4>
 </div>
-
-## Installation Guide
-- [⬇️Download](https://github.com/pratikjshah/symbol-browser/releases/latest/download/symbol-browser.sketchplugin.zip) the latest release of the plugin
-- Un-zip
-- Double-click on the `symbol-browser.sketchplugin`
 
 <br/>
 
@@ -40,6 +47,94 @@ This plugin lets you..
 <br/>
 
 ## FAQ
+
+<div>
+  <h4>
+    <a href="https://sketch.cloud/s/DVnWq">
+      Example Sketch Library
+    </a>    
+    <span> | </span>
+    <a href="https://github.com/pratikjshah/symbol-browser/wiki/Cheat-sheet-for-Stickers">
+      Cheatsheet for Stickers
+    </a>
+  </h4>
+</div>
+
+<br/>
+
+<details><summary><b>What is a Sticker?</b></summary>
+<p>
+
+A sticker is nothing but a specially tagged layer item. 
+
+This can be shape/text layer, group, artboard or even symbol instance. You can use Sticker as a component of your UI Kit which you repeatedly use and want to save time re-creating it.
+
+Check a syntax <b>[cheatsheet for Stickers](https://github.com/pratikjshah/symbol-browser/wiki/Cheat-sheet-for-Stickers)</b> to explore what all you can do!
+
+</p>
+</details>
+
+<details><summary><b>How do I add my custom stickers?</b></summary>
+<p>
+
+To add any layer as your Sticker, you just have to "specially" tag it. Take look at below image to see how you can tag an artboard, symbol instances and any layer or group.
+
+<img src="https://github.com/pratikjshah/symbol-browser/blob/master/art/add-custom-stickers.png?raw=true" alt="Sketch Symbol Browser" width="100%" />
+
+This tagging is a **suffix** which looks like this
+
+<pre><code>
+To tag a layer with Main Category
+<b>Layer_Name <i>@MyStickers</i></b>
+
+OR
+
+To tag a layer under Sub Category
+<b>Layer_Name <i>@MyStickers.InfoCards</i></b>
+
+
+<sub><i>You can tag multiple layers with the same category.</i></sub>
+
+</code></pre>
+
+
+*Note: Here <b>MyStickers</b> and <b>InfoCards</b> are the defined categories.*
+
+Know more about *"How to define categories?"* in next question.
+
+</p>
+</details>
+
+<details><summary><b>How to define Sticker categories?</b></summary>
+<p>
+
+Sticker categories are the logical sections you create to better distribute and logically group Stickers.
+You can currently have 2 levels of category.
+
+<img src="https://github.com/pratikjshah/symbol-browser/blob/master/art/define-categories.png?raw=true" alt="Sketch Symbol Browser" width="100%" />
+
+```yaml
+#To define Parent Category
+
+!StickerSection @Section1                         # categoryId
+title: My Stickers                                # Optional, if not provided uses categoryId, provides readable name
+description: 'A description'                      # Optional, Supports basic HTML tags
+
+```
+
+```yaml
+#To define Sub Category
+
+!StickerSection @Section1.SubSection              # append subCatId to categoryId with .
+title: Info Cards                                 # Optional, if not provided uses SubCatId
+description: 'A description'                      # Optional, Supports basic HTML tags
+
+```
+
+Check out <a href="https://github.com/pratikjshah/symbol-browser/wiki/Cheat-sheet-for-Stickers">Cheatsheet for Stickers</a> for more details.
+
+</p>
+</details>
 
 <details><summary><b>Why is it taking so long for indexing?</b></summary>
 <p>
