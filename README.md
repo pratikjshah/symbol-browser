@@ -33,7 +33,7 @@ This plugin lets you..
       Help and FAQs
     </a>
     <span> | </span>
-    <a href="https://github.com/pratikjshah/symbol-browser/wiki/Cheat-sheet-for-Stickers">
+    <a href="https://github.com/pratikjshah/symbol-browser/wiki/Getting-started-with-Symbols-Browser#steps-to-get-started">
       Cheatsheet for Stickers
     </a>
   </h4>
@@ -54,7 +54,7 @@ This plugin lets you..
       Example Sketch Library
     </a>    
     <span> | </span>
-    <a href="https://github.com/pratikjshah/symbol-browser/wiki/Cheat-sheet-for-Stickers">
+    <a href="https://github.com/pratikjshah/symbol-browser/wiki/Getting-started-with-Symbols-Browser#steps-to-get-started">
       Cheatsheet for Stickers
     </a>
   </h4>
@@ -69,7 +69,7 @@ A sticker is nothing but a specially tagged layer item.
 
 This can be shape/text layer, group, artboard or even symbol instance. You can use Sticker as a component of your UI Kit which you repeatedly use and want to save time re-creating it.
 
-Check a syntax <b>[cheatsheet for Stickers](https://github.com/pratikjshah/symbol-browser/wiki/Cheat-sheet-for-Stickers)</b> to explore what all you can do!
+Check a syntax <b>[cheatsheet for Stickers](https://github.com/pratikjshah/symbol-browser/wiki/Getting-started-with-Symbols-Browser#steps-to-get-started)</b> to explore what all you can do!
 
 </p>
 </details>
@@ -131,7 +131,7 @@ description: 'A description'                      # Optional, Supports basic HTM
 
 ```
 
-Check out <a href="https://github.com/pratikjshah/symbol-browser/wiki/Cheat-sheet-for-Stickers">Cheatsheet for Stickers</a> for more details.
+Check out <a href="https://github.com/pratikjshah/symbol-browser/wiki/Getting-started-with-Symbols-Browser#steps-to-get-started">Cheatsheet for Stickers</a> for more details.
 
 </p>
 </details>
