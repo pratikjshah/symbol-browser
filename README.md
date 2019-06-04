@@ -2,7 +2,7 @@
 
 <img src="https://raw.githubusercontent.com/pratikjshah/symbol-browser/master/art/symbol-browser-logo.png" alt="Sketch Symbol Browser" width="160" align="right" />
 
-Better way to browse your <b>Design System</b> and <b>UI Sticker sheet</b>. <br/>
+<b>Better way to browse your symbols.</b> Make the most of your Design System by bring symbols and UI Sticker sheet togather. <br/>
 
 This plugin lets you..
 - Browse Sketch symbols
@@ -34,7 +34,7 @@ This plugin lets you..
     </a>
     <span> | </span>
     <a href="https://github.com/pratikjshah/symbol-browser/wiki/Getting-started-with-Symbols-Browser#steps-to-get-started">
-      Cheatsheet for Stickers
+      Getting Started with Symbol Browser
     </a>
   </h4>
 </div>
@@ -55,7 +55,7 @@ This plugin lets you..
     </a>    
     <span> | </span>
     <a href="https://github.com/pratikjshah/symbol-browser/wiki/Getting-started-with-Symbols-Browser#steps-to-get-started">
-      Cheatsheet for Stickers
+      Getting Started with Symbol Browser
     </a>
   </h4>
 </div>
