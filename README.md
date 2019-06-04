@@ -2,7 +2,8 @@
 
 <img src="https://raw.githubusercontent.com/pratikjshah/symbol-browser/master/art/symbol-browser-logo.png" alt="Sketch Symbol Browser" width="160" align="right" />
 
-<b>Better way to browse your symbols.</b> Make the most of your Design System by bring symbols and UI Sticker sheet togather. <br/>
+<b>Better way to browse your symbols.</b> Make the most of your Design System by bringing symbols and UI Sticker sheet together.
+<br/>
 
 This plugin lets you..
 - Browse Sketch symbols
