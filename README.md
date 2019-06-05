@@ -12,10 +12,15 @@ This plugin lets you..
 - `New` Share instances of the Symbol
 - `New` Works offline
 
+<a href="http://symbol-browser.pratikshah.website">
+Visit plugin website for more.
+</a>
+
+<!--
 [![GitHub Release](https://github-basic-badges.herokuapp.com/release/pratikjshah/symbol-browser.svg)]()
 [![GitHub Download Count](https://github-basic-badges.herokuapp.com/downloads/pratikjshah/symbol-browser/total.svg)]()
 [![GitHub License](https://github-basic-badges.herokuapp.com/license/pratikjshah/symbol-browser.svg)]()
-
+-->
 ## Installation Guide
 - [⬇️Download](https://github.com/pratikjshah/symbol-browser/releases/latest/download/symbol-browser.sketchplugin.zip) the latest release of the plugin
 - Un-zip
