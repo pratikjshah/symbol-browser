@@ -15,12 +15,14 @@ This plugin lets you..
 <a href="http://symbol-browser.pratikshah.website">
 Visit plugin website for more.
 </a>
+<br/>
 
-<!--
-[![GitHub Release](https://github-basic-badges.herokuapp.com/release/pratikjshah/symbol-browser.svg)]()
-[![GitHub Download Count](https://github-basic-badges.herokuapp.com/downloads/pratikjshah/symbol-browser/total.svg)]()
-[![GitHub License](https://github-basic-badges.herokuapp.com/license/pratikjshah/symbol-browser.svg)]()
--->
+
+[![GitHub Release](https://img.shields.io/github/release/pratikjshah/symbol-browser.svg?style=popout)]()
+[![Github All Releases](https://img.shields.io/github/downloads/pratikjshah/symbol-browser/total.svg?style=popout)]()
+[![GitHub License](https://img.shields.io/github/license/pratikjshah/symbol-browser.svg?style=popout)]()
+
+
 ## Installation Guide
 - [⬇️Download](https://github.com/pratikjshah/symbol-browser/releases/latest/download/symbol-browser.sketchplugin.zip) the latest release of the plugin
 - Un-zip
