@@ -6,6 +6,19 @@
         <description>Better way to browse your Design System and UI Sticker sheet</description>
         <language>en</language>
         <item>
+            <title>v2.1.1</title>
+            <description>
+                <![CDATA[
+                  <h2>Initial Build</h2>
+                ]]>
+            </description>
+            <pubDate>Mon, 10 Jun 2019 20:54:24 GMT</pubDate>
+            <enclosure
+                url="https://github.com/pratikjshah/symbol-browser/archive/v2.1.1.zip"
+                sparkle:version="2.1.1"
+                type="application/octet-stream"/>
+        </item>
+        <item>
             <title>v2.1.0</title>
             <description>
                 <![CDATA[

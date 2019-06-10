@@ -8,7 +8,7 @@
   "updateURL": "https://github.com/pratikjshah/symbol-browser/archive/master.zip",
   "downloadURL": "https://github.com/pratikjshah/symbol-browser/archive/master.zip",
   "homepage": "http://symbol-browser.pratikshah.website/",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "identifier": "website.pratikshah.symbol-browser",
   "compatibleVersion": "52",
   "bundleVersion": "1",
@@ -48,7 +48,7 @@
       "script": "handler.js",
       "handler": "openDocumentation",
       "shortcut": "",
-      "name": "Syntax guide for Stickers",
+      "name": "Getting started with Stickers",
       "identifier": "openDocumentation",
       "description": "View Symtax guide for adding Stickers",
       "icon": "icon-menu.png"

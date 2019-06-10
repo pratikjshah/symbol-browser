@@ -83,7 +83,7 @@ export function manageUpdate(remoteManifest, isDailyCheck) {
 	}*/
 
     if (remoteManifest.localVersion) {
-        if (userConfig.localVersion == remoteManifest.localVersion) {
+        if (userConfig.localVersion === remoteManifest.localVersion) {
         	if(!isDailyCheck) {
         		showMsg("🤘Yo🤘! You are using the latest version of " + userConfig.name);
         	}

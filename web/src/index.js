@@ -40,6 +40,10 @@ const MAX_DRAW_WIDTH = 300;
 const MAX_DRAW_HEIGHT = 400;
 
 
+var typingTimer = null;
+var doneTypingInterval = 1000;
+
+
 // page controller
 class StickersPage {
   constructor() {
@@ -102,6 +106,8 @@ class StickersPage {
       StickersClient.openUrl(url);
       ev.preventDefault();
     });
+
+    // setupSearchHistoryList();
 
     var me = this;
 
@@ -172,10 +178,21 @@ class StickersPage {
               me.updateSearch();
             }
           }
+          // clearTimeout(typingTimer);
+        },
+        onSearchKeyup(ev) {
+          // clearTimeout(typingTimer);
+          // typingTimer = setTimeout( function() {
+          //   updateSearchHistory(me.vueGlobal.searchText)
+          // }, doneTypingInterval);
         },
         onSearchInput(ev) {
           $(window).scrollTop(0);
           me.updateSearch();
+          // clearTimeout(ev._timer);
+          // ev._timer = setTimeout(()=>{
+          //   me.updateSearchHistory();
+          // }, 500);
         },
       },
     });
@@ -317,6 +334,39 @@ class StickersPage {
       });
     });
   }
+}
+
+function updateSearchHistory(searchTerm) {
+  // console.log("searchText: " + searchTerm);
+  var localHistory = [];
+  if (localStorage.getItem("searchHistory") !== null) {
+    localHistory = JSON.parse(localStorage.getItem("searchHistory"));
+  }
+  if((!localHistory.includes(searchTerm)) && searchTerm.length > 3) {
+    localHistory.push(searchTerm);
+    addItemToSearchHistoryList(searchTerm);
+  }
+  localStorage.setItem("searchHistory", JSON.stringify(localHistory));
+  // $("#log").val(JSON.stringify(localHistory));
+}
+
+function setupSearchHistoryList() {
+  /* ======= setting up search history ========== */
+  var localHistory = [];
+  // localStorage.clear();
+  if (localStorage.getItem("searchHistory") !== null) {
+    localHistory = JSON.parse(localStorage.getItem("searchHistory"));
+  }
+  localHistory.forEach(function(item){
+    addItemToSearchHistoryList(item);
+  });
+}
+
+function addItemToSearchHistoryList(item) {
+  var list = document.getElementById('searchHistory');
+  var option = document.createElement('option');
+     option.value = item;
+     list.appendChild(option);
 }
 
 $(window).on('load', () => {

@@ -994,10 +994,27 @@ body[is-dark-theme] .page-loading .zero-state__image {
         <input class="header-area__search-field"
             v-model="$globals.searchText"
             v-on:keydown="onSearchKeydown($event)"
+            v-on:keyup="onSearchKeyup($event)"
             v-on:input="onSearchInput($event)"
             autocorrect="off"
             spellcheck="false"
-            placeholder="Search for a sticker">
+            placeholder="Search.."
+            list="searchHistory">
+                <datalist id="searchHistory">
+                  <!-- <option value="HTML">
+                  <option value="CSS">
+                  <option value="JavaScript">
+                  <option value="Java">
+                  <option value="Ruby">
+                  <option value="PHP">
+                  <option value="Go">
+                  <option value="Erlang">
+                  <option value="Python">
+                  <option value="C">
+                  <option value="C#">
+                  <option value="C++"> -->
+                </datalist>
+            <!-- <input id="log" class="header-area__search-field" v-if="stickerIndex" style="margin-left: 350px;"> -->
       </div>
       <div v-if="stickerIndex"><a class="sticker-root-section__link" 
         href="http://symbol-browser.pratikshah.website/#faq"
@@ -1147,6 +1164,5 @@ body[is-dark-theme] .page-loading .zero-state__image {
 
   <script src="plugin-call.js"></script>
   <script src="index.js"></script>
-
 </body>
 </html>

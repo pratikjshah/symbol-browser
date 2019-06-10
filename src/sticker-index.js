@@ -166,14 +166,25 @@ async function buildStickerIndexForLibrary(libraryId, defaultLibName, document, 
         init = (layerName.substring(0, layerName.lastIndexOf("/") + 0)).replace(/\s\s+/g, ' ').replace(/\//g,'_').replace(/\s/g,'');
         last = layerName.substring(layerName.lastIndexOf("/") + 1, layerName.length);
       } else {
-        init = layerName.replace(/\s/g,'');;
+      // var layerSpliter = "/";
+      // var layerSpliterCount = ((layerName.match(/[\/]/g,) || []).length);
+      // if(layerSpliterCount > 0) {
+      //   if(layerSpliterCount >= 3) {
+      //     var position = getPosition(layerName, layerSpliter, Math.min(3, Math.floor(layerSpliterCount/2)));
+      //   } else {
+      //     var position = layerName.indexOf(layerSpliter);
+      //   }
+
+      //   init = (layerName.substring(0, position + 0)).replace(/\s\s+/g, ' ').replace(/\//g,'_').replace(/\s/g,'');
+      //   last = layerName.substring(position, layerName.length);
+      // } else {
+        init = layerName.replace(/\s/g,'');
         last = layerName;
       }
 
       metaData = {};
       metaData.name = "@" + _defaultSection + "." + init;
-      // symbolLayer.name = last + " " + "@" + _defaultSection + "." + init;
-      symbolInstance.name = last + " " + "@" + _defaultSection + "." + init;
+      symbolInstance.name = layerName + " " + "@" + _defaultSection + "." + init;
       symbolStickersMetaData.push(metaData);
 
       allSymbolInstances.push(symbolInstance);
@@ -476,4 +487,8 @@ function getCategoryName(name) {
     }
   });
   return newName;
+}
+
+function getPosition(string, subString, index) {
+   return string.split(subString, index).join(subString).length;
 }

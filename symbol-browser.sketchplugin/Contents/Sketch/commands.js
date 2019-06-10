@@ -26058,7 +26058,7 @@ function manageUpdate(remoteManifest, isDailyCheck) {
   	showMsg(userConfig.name + ": "+ userConfig.localVersion + " is out of date! Please check for updates.");
   }*/
   if (remoteManifest.localVersion) {
-    if (userConfig.localVersion == remoteManifest.localVersion) {
+    if (userConfig.localVersion === remoteManifest.localVersion) {
       if (!isDailyCheck) {
         showMsg("🤘Yo🤘! You are using the latest version of " + userConfig.name);
       }
@@ -26493,15 +26493,24 @@ function _buildStickerIndexForLibrary() {
                 init = layerName.substring(0, layerName.lastIndexOf("/") + 0).replace(/\s\s+/g, ' ').replace(/\//g, '_').replace(/\s/g, '');
                 last = layerName.substring(layerName.lastIndexOf("/") + 1, layerName.length);
               } else {
+                // var layerSpliter = "/";
+                // var layerSpliterCount = ((layerName.match(/[\/]/g,) || []).length);
+                // if(layerSpliterCount > 0) {
+                //   if(layerSpliterCount >= 3) {
+                //     var position = getPosition(layerName, layerSpliter, Math.min(3, Math.floor(layerSpliterCount/2)));
+                //   } else {
+                //     var position = layerName.indexOf(layerSpliter);
+                //   }
+                //   init = (layerName.substring(0, position + 0)).replace(/\s\s+/g, ' ').replace(/\//g,'_').replace(/\s/g,'');
+                //   last = layerName.substring(position, layerName.length);
+                // } else {
                 init = layerName.replace(/\s/g, '');
-                ;
                 last = layerName;
               }
 
               metaData = {};
-              metaData.name = "@" + _defaultSection + "." + init; // symbolLayer.name = last + " " + "@" + _defaultSection + "." + init;
-
-              symbolInstance.name = last + " " + "@" + _defaultSection + "." + init;
+              metaData.name = "@" + _defaultSection + "." + init;
+              symbolInstance.name = layerName + " " + "@" + _defaultSection + "." + init;
               symbolStickersMetaData.push(metaData);
               allSymbolInstances.push(symbolInstance);
             }
@@ -27093,6 +27102,10 @@ function getCategoryName(name) {
   });
   return newName;
 }
+
+function getPosition(string, subString, index) {
+  return string.split(subString, index).join(subString).length;
+}
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/promise-polyfill/lib/index.js */ "./node_modules/promise-polyfill/lib/index.js")))
 
 /***/ }),
@@ -27241,10 +27254,7 @@ function () {
         _this.setPersistedObj(null);
 
         coscript.setShouldKeepAround(false);
-      });
-      this.browserWindow.on('blur', function () {
-        return _this.browserWindow.close();
-      });
+      }); // this.browserWindow.on('blur', () => this.browserWindow.close());
 
       if (UI_MODE == 'cover') {
         this.browserWindow.setResizable(false);

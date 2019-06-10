@@ -1500,7 +1500,7 @@ function manageUpdate(remoteManifest, isDailyCheck) {
   	showMsg(userConfig.name + ": "+ userConfig.localVersion + " is out of date! Please check for updates.");
   }*/
   if (remoteManifest.localVersion) {
-    if (userConfig.localVersion == remoteManifest.localVersion) {
+    if (userConfig.localVersion === remoteManifest.localVersion) {
       if (!isDailyCheck) {
         showMsg("🤘Yo🤘! You are using the latest version of " + userConfig.name);
       }
