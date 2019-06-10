@@ -15,7 +15,7 @@ This plugin lets you..
 <a href="http://symbol-browser.pratikshah.website">
 Visit plugin website for more.
 </a>
-<br/>
+<br/><br/>
 
 
 [![GitHub Release](https://img.shields.io/github/release/pratikjshah/symbol-browser.svg?style=popout)]()
