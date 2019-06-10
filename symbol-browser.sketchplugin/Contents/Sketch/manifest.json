@@ -5,8 +5,6 @@
   "author": "Pratik Shah",
   "email": "hello@pratikshah.website",
   "appcast": "https://raw.githubusercontent.com/pratikjshah/symbol-browser/master/appcast.xml",
-  "updateURL": "https://github.com/pratikjshah/symbol-browser/archive/master.zip",
-  "downloadURL": "https://github.com/pratikjshah/symbol-browser/archive/master.zip",
   "homepage": "http://symbol-browser.pratikshah.website/",
   "version": "2.1.1",
   "identifier": "website.pratikshah.symbol-browser",
