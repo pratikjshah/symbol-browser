@@ -41,7 +41,7 @@ let _defaultSection = 'DefaultSymbols';
  */
 export async function makeStickerIndexForLibraries({onProgress}) {
   let libraries = Array.from(NSApp.delegate().librariesController().libraries())
-      .filter(lib => !!lib.locationOnDisk() && !!lib.enabled() && !!lib.libraryID())
+    .filter(lib => !!lib.locationOnDisk() && !!lib.enabled() && !!lib.libraryID())
       .map(lib => ({
         libraryId: String(lib.libraryID()),
         name: String(lib.name()),
@@ -56,6 +56,8 @@ export async function makeStickerIndexForLibraries({onProgress}) {
         }
         return firstWithId;
       });
+      log("filttered libraries");
+      log(libraries);
 
   let progressReporter = new ProgressReporter();
   progressReporter.on('progress', progress => onProgress(progress));
@@ -191,28 +193,41 @@ async function buildStickerIndexForLibrary(libraryId, defaultLibName, document, 
     }
 
     let tempParsedMetadata = parseStickerMetadata(text);
-    Array.prototype.push.apply(parsedMetadata.sections, tempParsedMetadata.sections);
+    log('symbolStickersMetaData');
+    log(parsedMetadata.sections.length);
+    log('otherStickersMetaData');
+    log(tempParsedMetadata.sections.length);
+
+    if(SHOW_DEFAULT_STICKERS) {
+      Array.prototype.push.apply(parsedMetadata.sections, tempParsedMetadata.sections);
+    } else {
+      parsedMetadata.sections = tempParsedMetadata.sections;
+    }
+
+    // Array.prototype.push.apply(parsedMetadata.sections, tempParsedMetadata.sections);
     parsedMetadata.libraryMeta = tempParsedMetadata.libraryMeta;
 
   }
 
-    for (let section of parsedMetadata.sections) {
-      section.libraryId = libraryId;
+  for (let section of parsedMetadata.sections) {
+    section.libraryId = libraryId;
 
-      if (section.id in sectionsById) {
-        log(`Duplicate sticker section id ${section.id}, skipping duplicates`);
-      } else {
-        sectionsById[section.id] = section;
-        libraryIndex.sections.push(section);
-      }
+    if (section.id in sectionsById) {
+      log(`Duplicate sticker section id ${section.id}, skipping duplicates`);
+    } else {
+      sectionsById[section.id] = section;
+      libraryIndex.sections.push(section);
     }
+  }
 
-    if (parsedMetadata.libraryMeta.title) {
-      libraryIndex.title = parsedMetadata.libraryMeta.title;
-    }
-    if (parsedMetadata.libraryMeta.subtitle) {
-      libraryIndex.subtitle = parsedMetadata.libraryMeta.subtitle;
-    }
+  if (parsedMetadata.libraryMeta.title) {
+    libraryIndex.title = parsedMetadata.libraryMeta.title;
+  }
+  if (parsedMetadata.libraryMeta.subtitle) {
+    libraryIndex.subtitle = parsedMetadata.libraryMeta.subtitle;
+  }
+
+
 
   // nest sections
   for (let section of Array.from(libraryIndex.sections)) {

@@ -26118,7 +26118,10 @@ function _makeStickerIndexForLibraries() {
         switch (_context.prev = _context.next) {
           case 0:
             onProgress = _ref.onProgress;
-            libraries = Array.from(NSApp.delegate().librariesController().libraries()).filter(function (lib) {
+            libraries = Array.from(NSApp.delegate().librariesController().libraries());
+            log("all libraries");
+            log(libraries);
+            libraries = libraries.filter(function (lib) {
               return !!lib.locationOnDisk() && !!lib.enabled() && !!lib.libraryID();
             }).map(function (lib) {
               return {
@@ -26138,6 +26141,8 @@ function _makeStickerIndexForLibraries() {
 
               return firstWithId;
             });
+            log("filttered libraries");
+            log(libraries);
             progressReporter = new _util_progress_reporter__WEBPACK_IMPORTED_MODULE_6__["ProgressReporter"]();
             progressReporter.on('progress', function (progress) {
               return onProgress(progress);
@@ -26150,20 +26155,20 @@ function _makeStickerIndexForLibraries() {
             _iteratorNormalCompletion2 = true;
             _didIteratorError2 = false;
             _iteratorError2 = undefined;
-            _context.prev = 9;
+            _context.prev = 14;
             _iterator2 = libraries.entries()[Symbol.iterator]();
 
-          case 11:
+          case 16:
             if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
-              _context.next = 39;
+              _context.next = 44;
               break;
             }
 
             _step2$value = _slicedToArray(_step2.value, 2), i = _step2$value[0], lib = _step2$value[1];
-            _context.next = 15;
+            _context.next = 20;
             return _util__WEBPACK_IMPORTED_MODULE_4__["unpeg"]();
 
-          case 15:
+          case 20:
             // for this library, checksum the contents so we can later check if it's changed
             // NOTE: performance should be pretty good for files a few MB in size
             fileHash = String(NSFileManager.defaultManager().contentsAtPath(lib.sketchFilePath).sha1AsString());
@@ -26178,17 +26183,17 @@ function _makeStickerIndexForLibraries() {
             } catch (e) {}
 
             if (!(FORCE_REBULD || !libraryIndex || !libraryIndex.archiveVersion || libraryIndex.fileHash !== fileHash || (libraryIndex.formatVersion || 0) < INDEX_FORMAT_VERSION)) {
-              _context.next = 34;
+              _context.next = 39;
               break;
             }
 
             // need to rebuild the cached index
             doc = _util__WEBPACK_IMPORTED_MODULE_4__["loadDocFromSketchFile"](lib.sketchFilePath);
             doc.setFileURL(NSURL.fileURLWithPath(lib.sketchFilePath));
-            _context.next = 25;
+            _context.next = 30;
             return buildStickerIndexForLibrary(lib.libraryId, lib.name, doc, childProgressReporters[i]);
 
-          case 25:
+          case 30:
             libraryIndex = _context.sent;
             // store library colors
             assets = doc.documentData().assets();
@@ -26217,63 +26222,63 @@ function _makeStickerIndexForLibraries() {
             })), {
               encoding: 'utf8'
             });
-            _context.next = 35;
-            break;
-
-          case 34:
-            childProgressReporters[i].forceProgress(1);
-
-          case 35:
-            compositeIndex.libraries.push(libraryIndex);
-
-          case 36:
-            _iteratorNormalCompletion2 = true;
-            _context.next = 11;
+            _context.next = 40;
             break;
 
           case 39:
-            _context.next = 45;
-            break;
+            childProgressReporters[i].forceProgress(1);
+
+          case 40:
+            compositeIndex.libraries.push(libraryIndex);
 
           case 41:
-            _context.prev = 41;
-            _context.t0 = _context["catch"](9);
+            _iteratorNormalCompletion2 = true;
+            _context.next = 16;
+            break;
+
+          case 44:
+            _context.next = 50;
+            break;
+
+          case 46:
+            _context.prev = 46;
+            _context.t0 = _context["catch"](14);
             _didIteratorError2 = true;
             _iteratorError2 = _context.t0;
 
-          case 45:
-            _context.prev = 45;
-            _context.prev = 46;
+          case 50:
+            _context.prev = 50;
+            _context.prev = 51;
 
             if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
               _iterator2.return();
             }
 
-          case 48:
-            _context.prev = 48;
+          case 53:
+            _context.prev = 53;
 
             if (!_didIteratorError2) {
-              _context.next = 51;
+              _context.next = 56;
               break;
             }
 
             throw _iteratorError2;
 
-          case 51:
-            return _context.finish(48);
+          case 56:
+            return _context.finish(53);
 
-          case 52:
-            return _context.finish(45);
+          case 57:
+            return _context.finish(50);
 
-          case 53:
+          case 58:
             return _context.abrupt("return", compositeIndex);
 
-          case 54:
+          case 59:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, null, [[9, 41, 45, 53], [46,, 48, 52]]);
+    }, _callee, null, [[14, 46, 50, 58], [51,, 53, 57]]);
   }));
   return _makeStickerIndexForLibraries.apply(this, arguments);
 }
@@ -26394,7 +26399,7 @@ function _buildStickerIndexForLibrary() {
 
           case 38:
             if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
-              _context3.next = 49;
+              _context3.next = 53;
               break;
             }
 
@@ -26406,57 +26411,68 @@ function _buildStickerIndexForLibrary() {
               break;
             }
 
-            return _context3.abrupt("continue", 46);
+            return _context3.abrupt("continue", 50);
 
           case 43:
             tempParsedMetadata = parseStickerMetadata(text);
-            Array.prototype.push.apply(parsedMetadata.sections, tempParsedMetadata.sections);
+            log('symbolStickersMetaData');
+            log(parsedMetadata.sections.length);
+            log('otherStickersMetaData');
+            log(tempParsedMetadata.sections.length);
+
+            if (SHOW_DEFAULT_STICKERS) {
+              Array.prototype.push.apply(parsedMetadata.sections, tempParsedMetadata.sections);
+            } else {
+              parsedMetadata.sections = tempParsedMetadata.sections;
+            } // Array.prototype.push.apply(parsedMetadata.sections, tempParsedMetadata.sections);
+
+
             parsedMetadata.libraryMeta = tempParsedMetadata.libraryMeta;
 
-          case 46:
+          case 50:
             _iteratorNormalCompletion4 = true;
             _context3.next = 38;
             break;
 
-          case 49:
-            _context3.next = 55;
+          case 53:
+            _context3.next = 59;
             break;
 
-          case 51:
-            _context3.prev = 51;
+          case 55:
+            _context3.prev = 55;
             _context3.t1 = _context3["catch"](36);
             _didIteratorError4 = true;
             _iteratorError4 = _context3.t1;
 
-          case 55:
-            _context3.prev = 55;
-            _context3.prev = 56;
+          case 59:
+            _context3.prev = 59;
+            _context3.prev = 60;
 
             if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
               _iterator4.return();
             }
 
-          case 58:
-            _context3.prev = 58;
+          case 62:
+            _context3.prev = 62;
 
             if (!_didIteratorError4) {
-              _context3.next = 61;
+              _context3.next = 65;
               break;
             }
 
             throw _iteratorError4;
 
-          case 61:
-            return _context3.finish(58);
+          case 65:
+            return _context3.finish(62);
 
-          case 62:
-            return _context3.finish(55);
+          case 66:
+            return _context3.finish(59);
 
-          case 63:
+          case 67:
             _iteratorNormalCompletion5 = true;
             _didIteratorError5 = false;
             _iteratorError5 = undefined;
-            _context3.prev = 66;
+            _context3.prev = 70;
 
             for (_iterator5 = parsedMetadata.sections[Symbol.iterator](); !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
               section = _step5.value;
@@ -26470,40 +26486,40 @@ function _buildStickerIndexForLibrary() {
               }
             }
 
-            _context3.next = 74;
+            _context3.next = 78;
             break;
-
-          case 70:
-            _context3.prev = 70;
-            _context3.t2 = _context3["catch"](66);
-            _didIteratorError5 = true;
-            _iteratorError5 = _context3.t2;
 
           case 74:
             _context3.prev = 74;
-            _context3.prev = 75;
+            _context3.t2 = _context3["catch"](70);
+            _didIteratorError5 = true;
+            _iteratorError5 = _context3.t2;
+
+          case 78:
+            _context3.prev = 78;
+            _context3.prev = 79;
 
             if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
               _iterator5.return();
             }
 
-          case 77:
-            _context3.prev = 77;
+          case 81:
+            _context3.prev = 81;
 
             if (!_didIteratorError5) {
-              _context3.next = 80;
+              _context3.next = 84;
               break;
             }
 
             throw _iteratorError5;
 
-          case 80:
-            return _context3.finish(77);
+          case 84:
+            return _context3.finish(81);
 
-          case 81:
-            return _context3.finish(74);
+          case 85:
+            return _context3.finish(78);
 
-          case 82:
+          case 86:
             if (parsedMetadata.libraryMeta.title) {
               libraryIndex.title = parsedMetadata.libraryMeta.title;
             }
@@ -26515,9 +26531,9 @@ function _buildStickerIndexForLibrary() {
 
             _i2 = 0, _Array$from = Array.from(libraryIndex.sections);
 
-          case 85:
+          case 89:
             if (!(_i2 < _Array$from.length)) {
-              _context3.next = 99;
+              _context3.next = 103;
               break;
             }
 
@@ -26525,32 +26541,32 @@ function _buildStickerIndexForLibrary() {
             parentId = _section.id.substr(0, _section.id.lastIndexOf('.'));
 
             if (!parentId) {
-              _context3.next = 96;
+              _context3.next = 100;
               break;
             }
 
             parentSection = sectionsById[parentId];
 
             if (parentSection) {
-              _context3.next = 93;
+              _context3.next = 97;
               break;
             }
 
             log("Unknown parent section ".concat(parentId));
-            return _context3.abrupt("continue", 96);
+            return _context3.abrupt("continue", 100);
 
-          case 93:
+          case 97:
             parentSection.items = parentSection.items || [];
             parentSection.items.push(_section); // remove from the root
 
             libraryIndex.sections.splice(libraryIndex.sections.indexOf(_section), 1);
 
-          case 96:
+          case 100:
             _i2++;
-            _context3.next = 85;
+            _context3.next = 89;
             break;
 
-          case 99:
+          case 103:
             libraryIndex.sections.push(libraryIndex.sections.shift()); // go through all layers tagged to a section
 
             possibleStickers = _util__WEBPACK_IMPORTED_MODULE_4__["getAllLayersMatchingPredicate"](document, NSPredicate.predicateWithFormat('name matches ".*@.*"'));
@@ -26562,12 +26578,12 @@ function _buildStickerIndexForLibrary() {
             _iteratorNormalCompletion6 = true;
             _didIteratorError6 = false;
             _iteratorError6 = undefined;
-            _context3.prev = 107;
+            _context3.prev = 111;
             _iterator6 = possibleStickers[Symbol.iterator]();
 
-          case 109:
+          case 113:
             if (_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done) {
-              _context3.next = 121;
+              _context3.next = 125;
               break;
             }
 
@@ -26575,13 +26591,13 @@ function _buildStickerIndexForLibrary() {
             progressReporter.increment();
 
             if (!(layer instanceof MSTextLayer && String(layer.name()).startsWith('!Sticker'))) {
-              _context3.next = 114;
+              _context3.next = 118;
               break;
             }
 
-            return _context3.abrupt("continue", 118);
+            return _context3.abrupt("continue", 122);
 
-          case 114:
+          case 118:
             parsedName = parseLayerName(layer.name(), function (sectionId) {
               return sectionId in sectionsById;
             }); // if this is an icon, capture it as the icon
@@ -26592,7 +26608,7 @@ function _buildStickerIndexForLibrary() {
             }
 
             if (!(parsedName.isSticker || layer instanceof MSSymbolMaster)) {
-              _context3.next = 118;
+              _context3.next = 122;
               break;
             }
 
@@ -26695,48 +26711,48 @@ function _buildStickerIndexForLibrary() {
                   }
                 }
               }, _callee2, null, [[15, 19, 23, 31], [24,, 26, 30]]);
-            })(), "t3", 118);
+            })(), "t3", 122);
 
-          case 118:
+          case 122:
             _iteratorNormalCompletion6 = true;
-            _context3.next = 109;
+            _context3.next = 113;
             break;
 
-          case 121:
-            _context3.next = 127;
+          case 125:
+            _context3.next = 131;
             break;
-
-          case 123:
-            _context3.prev = 123;
-            _context3.t4 = _context3["catch"](107);
-            _didIteratorError6 = true;
-            _iteratorError6 = _context3.t4;
 
           case 127:
             _context3.prev = 127;
-            _context3.prev = 128;
+            _context3.t4 = _context3["catch"](111);
+            _didIteratorError6 = true;
+            _iteratorError6 = _context3.t4;
+
+          case 131:
+            _context3.prev = 131;
+            _context3.prev = 132;
 
             if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
               _iterator6.return();
             }
 
-          case 130:
-            _context3.prev = 130;
+          case 134:
+            _context3.prev = 134;
 
             if (!_didIteratorError6) {
-              _context3.next = 133;
+              _context3.next = 137;
               break;
             }
 
             throw _iteratorError6;
 
-          case 133:
-            return _context3.finish(130);
+          case 137:
+            return _context3.finish(134);
 
-          case 134:
-            return _context3.finish(127);
+          case 138:
+            return _context3.finish(131);
 
-          case 135:
+          case 139:
             // cull any sections that don't indirectly or directly contain stickers
             nonEmptyItems = function nonEmptyItems(items) {
               return items.filter(function (item) {
@@ -26753,12 +26769,12 @@ function _buildStickerIndexForLibrary() {
             libraryIndex.title = libraryIndex.title || defaultLibName || _util__WEBPACK_IMPORTED_MODULE_4__["getDocumentName"](document);
             return _context3.abrupt("return", libraryIndex);
 
-          case 139:
+          case 143:
           case "end":
             return _context3.stop();
         }
       }
-    }, _callee3, null, [[14, 18, 22, 30], [23,, 25, 29], [36, 51, 55, 63], [56,, 58, 62], [66, 70, 74, 82], [75,, 77, 81], [107, 123, 127, 135], [128,, 130, 134]]);
+    }, _callee3, null, [[14, 18, 22, 30], [23,, 25, 29], [36, 55, 59, 67], [60,, 62, 66], [70, 74, 78, 86], [79,, 81, 85], [111, 127, 131, 139], [132,, 134, 138]]);
   }));
   return _buildStickerIndexForLibrary.apply(this, arguments);
 }
@@ -27022,7 +27038,8 @@ function () {
       var browserWindow = this.getPersistedObj();
 
       if (browserWindow) {
-        browserWindow.focus(); // browserWindow.moveTop();
+        browserWindow.focus();
+        browserWindow.show(); // browserWindow.moveTop();
         // browserWindow.close();
         // this.setPersistedObj(null);
       } else {

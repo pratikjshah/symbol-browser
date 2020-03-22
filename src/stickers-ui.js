@@ -46,6 +46,7 @@ export class StickersUI {
     let browserWindow = this.getPersistedObj();
     if (browserWindow) {
       browserWindow.focus();
+      browserWindow.show();
       // browserWindow.moveTop();
       // browserWindow.close();
       // this.setPersistedObj(null);
