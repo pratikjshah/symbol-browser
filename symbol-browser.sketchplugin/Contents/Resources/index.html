@@ -104,7 +104,7 @@ body {
     --side-margin:36px;--left-keyline:316px;--root-section-vert-padding:40px}
 
 body[is-dark-theme] {
-    --theme-color-bg:#202124;--theme-color-bg-level-2:#2e3034;--theme-color-bg-level-3:#383a3f;--theme-color-bg-floating-header:rgba(32,33,36,.75);--theme-color-fg-primary:#fff;--theme-color-fg-secondary:hsla(0,0%,100%,.7);--theme-color-fg-tertiary:hsla(0,0%,100%,.5);--theme-color-thin-border:hsla(0,0%,100%,.2);--theme-color-accent:#536dfe;--theme-color-button:#8698fe;--theme-color-button-hover:#9faefe;--theme-color-button-active:#b8c3ff;--theme-color-button-fg:#000;--theme-color-search:hsla(0,0%,100%,.2);--theme-color-search-active:hsla(0,0%,100%,.3);--theme-color-search-highlight:#f29900;--theme-gradient-fade-to-bg:linear-gradient(90deg,#202124 0%,rgba(32,33,36,.9) 30%,rgba(32,33,36,.67) 60%,rgba(32,33,36,.5) 75%,rgba(32,33,36,.33) 85%,rgba(32,33,36,0))}
+    --theme-color-bg:#202124;--theme-color-bg-level-2:#2e3034;--theme-color-bg-level-3:#383a3f;--theme-color-bg-floating-header:rgba(32,33,36,.75);--theme-color-fg-primary:#fff;--theme-color-fg-secondary:hsla(0,0%,100%,.7);--theme-color-fg-tertiary:hsla(0,0%,100%,.5);--theme-color-thin-border:hsla(0,0%,100%,.2);--theme-color-accent:#536dfe;--theme-color-button:#8698fe;--theme-color-button-hover:#9faefe;--theme-color-button-active:#b8c3ff;--theme-color-button-fg:#000;--theme-color-search:hsla(0,0%,100%,.2);--theme-color-search-active:hsla(0,0%,100%,.3);--theme-color-search-highlight:#f29900;--theme-gradient-fade-to-bg:linear-gradient(90deg,#202124 0%,rgba(32,33,36,.9) 30%,rgba(32,33,36,.67) 60%,rgba(32,33,36,.5) 75%,rgba(32,33,36,.33) 85%,rgba(32,33,36,0));}
 
 @media only screen and (max-width: 800px) {
     body[ui-mode=palette] {
@@ -151,7 +151,15 @@ body[is-dark-theme] {
     background-color: transparent;
     outline: none;
     font-size: 14px;
-    line-height: 20px
+    line-height: 20px;
+
+    background: url('./logo-light.svg') no-repeat;
+    height: 32px;
+    width: 171px;
+    margin: 0;
+}
+body[is-dark-theme] .header-area__back-button {
+    background: url('./logo-dark.svg') no-repeat;
 }
 
 [ui-mode=palette] .header-area__back-button {
@@ -217,11 +225,52 @@ body[is-dark-theme] {
     color: var(--theme-color-fg-secondary)
 }
 
+.navigation-area {
+    position: fixed;
+    left: 0;
+    top: 48px;
+    right: 0;
+    height: 48px;
+    z-index: 8;
+    box-shadow: 0 1px 0 var(--theme-color-thin-border);
+    background: var(--theme-color-bg-floating-header);
+}
+
+.navigation-area .library-tabs {
+    overflow: auto;
+    white-space: nowrap;
+    overflow-x: auto;
+    padding: 0px var(--side-margin);
+}
+
+.navigation-area .library-tabs .library-tab {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-right: 16px;
+    text-decoration: none;
+    font-size: 16px;
+    line-height: 28px;
+    font-weight: bold;
+    color: var(--theme-color-fg-secondary);
+    box-shadow: none;
+    cursor: pointer;
+}
+
+.navigation-area .library-tabs .library-tab:hover {
+    color: var(--theme-color-fg-primary);
+    box-shadow: inset 0 -3px 0 0 var(--theme-color-fg-secondary);
+}
+
+.navigation-area .library-tabs .library-tab.active, .navigation-area .library-tabs .library-tab.active:hover {
+    color: var(--theme-color-button);
+    box-shadow: inset 0 -3px 0 0 var(--theme-color-button);
+}
+
 .stickers-area {
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
-    padding-top: 48px
+    padding-top: 96px
 }
 
 .sticker-library-header {
@@ -375,7 +424,7 @@ body[is-dark-theme] {
     align-self: flex-start;
     position: sticky;
     position: -webkit-sticky;
-    top: calc(var(--root-section-vert-padding) + 48px);
+    top: calc(var(--root-section-vert-padding) + 72px);
     box-sizing: border-box;
     display: flex;
     flex: 0 0 auto;
@@ -567,7 +616,9 @@ body[is-dark-theme] {
     cursor: pointer;
     background-color: transparent;
     transition: transform .1s ease,opacity .1s ease;
-    opacity: 1
+    opacity: 1;
+    min-width: 24px;
+    min-height: 24px;
 }
 
 .sticker__thumb:hover {
@@ -986,8 +1037,9 @@ body[is-dark-theme] .page-loading .zero-state__image {
   <div class="root" v-cloak>
     <div class="header-area">
       <button class="header-area__back-button" v-on:click="closeWindow">
-        <svg-icon glyph="arrow_back_ios"></svg-icon>
-        <span>Back to Sketch</span>
+        
+        <!-- <svg-icon glyph="arrow_back_ios"></svg-icon>
+        <span>Back to Sketch</span> -->
       </button>
       <div class="header-area__search-field-container" v-if="stickerIndex">
         <svg-icon glyph="search"></svg-icon>
@@ -1021,10 +1073,26 @@ body[is-dark-theme] .page-loading .zero-state__image {
         style="margin-top: 0;">FAQs</a></div>
     </div>
 
+    <div class="navigation-area" v-if="stickerIndex">
+        <div class="library-tabs">
+            <div class="library-tab active"
+                data-key="all">
+                All
+            </div>
+            <div class="library-tab"
+                v-for="library in stickerIndex.libraries"
+                :data-key="library.id"
+                :key="library.id">
+                {{ library.title }}
+            </div>
+      </div>
+    </div>
+
     <div class="stickers-area" v-if="stickerIndex">
       <div v-for="library in stickerIndex.libraries"
           v-if="!library._hide"
           class="sticker-library-container"
+          :id="library.id"
           :key="library.id">
         <div class="sticker-library-header">
           <div class="sticker-library-header__icon" v-if="library.iconPath"
@@ -1106,7 +1174,7 @@ body[is-dark-theme] .page-loading .zero-state__image {
       <div class="zero-state search-empty" v-if="$globals.searchText">
         <div class="zero-state__image"><div class="element"></div></div>
         <span class="zero-state__text">
-          No symbols or categories matched <em>'{{ $globals.searchText }}'</em>
+          No symbols or categories matched for <em>'{{ $globals.searchText }}'</em>
         </span>
       </div>
     </div>

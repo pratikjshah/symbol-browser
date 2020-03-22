@@ -55,6 +55,11 @@ class StickersPage {
       this.vue.stickerIndex = this.processRawStickerIndex(rawStickerIndex);
       this.vue.$nextTick(() => {
         $('.header-area__search-field').focus();
+        if($('*[data-key="'+localStorage.getItem('activeLibrary')+'"]') == null) {
+          $('*[data-key="all"]').click();
+        } else {
+          $('*[data-key="'+localStorage.getItem('activeLibrary')+'"]').click();
+        }
         this.loadVisibleStickers();
       });
     });
@@ -246,8 +251,14 @@ class StickersPage {
       };
 
       let anyResults = false;
-      for (const library of this.vue.stickerIndex.libraries) {
+      let seelctedLibraries = this.vue.stickerIndex.libraries;
+      let activeLibrary = localStorage.getItem('activeLibrary');
+
+      for (const library of seelctedLibraries) {
         let foundInLibrary = false;
+        if(library.id != activeLibrary || activeLibrary != 'all') {
+          break;
+        }
         for (const section of library.sections) {
           let found;
           for (const row of section.rows) {
@@ -302,6 +313,33 @@ class StickersPage {
         height: rect.bottom - rect.top
       };
       StickersClient.startDragging(stickerId, rect);
+    });
+
+    if(localStorage.getItem('activeLibrary') == null) {
+      localStorage.setItem("activeLibrary", 'all');
+    }
+
+    $(document).on('click', '.library-tab', ev => {
+      $(ev.target).addClass('active');
+      $(ev.target).siblings().removeClass('active');
+
+      var key = $(ev.target).attr('data-key');
+      var libraryContainer = '.sticker-library-container';
+
+      localStorage.setItem("activeLibrary", key);
+
+      if(key === 'all') {
+        $(libraryContainer).show();
+      } else {
+        $('#' + key + libraryContainer).show();
+        $('#' + key + libraryContainer).siblings().hide();
+      }
+      //$('.autocomplete').focus();
+      if($(document.body).hasClass('no-search-results')) {
+        $(document.body).removeClass('no-search-results');
+      }
+      this.updateSearch();
+
     });
 
     this.setupStickerImageLoading();

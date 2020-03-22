@@ -155,39 +155,24 @@ async function buildStickerIndexForLibrary(libraryId, defaultLibName, document, 
 
       var init, last;
       var layerName = symbolInstance.name() + "";
-      // var ranges = [
-      //               '\ud83c[\udf00-\udfff]', // U+1F300 to U+1F3FF
-      //               '\ud83d[\udc00-\ude4f]', // U+1F400 to U+1F64F
-      //               '\ud83d[\ude80-\udeff]'  // U+1F680 to U+1F6FF
-      //             ];
-      // layerName = layerName.replace(new RegExp(ranges.join('|'), 'g'), '').replace(/[&#,+()$~%.'":*?<>{}-]/g, '');
-      layerName = layerName.replace(/[^a-zA-Z0-9 \/_]/g, '');
-      if(layerName.lastIndexOf("/") > 0) {
-        init = (layerName.substring(0, layerName.lastIndexOf("/") + 0)).replace(/\s\s+/g, ' ').replace(/\//g,'_').replace(/\s/g,'');
-        last = layerName.substring(layerName.lastIndexOf("/") + 1, layerName.length);
-      } else {
-      // var layerSpliter = "/";
-      // var layerSpliterCount = ((layerName.match(/[\/]/g,) || []).length);
-      // if(layerSpliterCount > 0) {
-      //   if(layerSpliterCount >= 3) {
-      //     var position = getPosition(layerName, layerSpliter, Math.min(3, Math.floor(layerSpliterCount/2)));
-      //   } else {
-      //     var position = layerName.indexOf(layerSpliter);
-      //   }
 
-      //   init = (layerName.substring(0, position + 0)).replace(/\s\s+/g, ' ').replace(/\//g,'_').replace(/\s/g,'');
-      //   last = layerName.substring(position, layerName.length);
-      // } else {
-        init = layerName.replace(/\s/g,'');
-        last = layerName;
+      if(layerName.indexOf("@") < 0) {
+        layerName = layerName.replace(/[^a-zA-Z0-9 \/_]/g, '');
+        if(layerName.lastIndexOf("/") > 0) {
+          init = (layerName.substring(0, layerName.lastIndexOf("/") + 0)).replace(/\s\s+/g, ' ').replace(/\//g,'_').replace(/\s/g,'');
+          last = layerName.substring(layerName.lastIndexOf("/") + 1, layerName.length);
+        } else {
+          init = layerName.replace(/\s/g,'');
+          last = layerName;
+        }
+
+        metaData = {};
+        metaData.name = "@" + _defaultSection + "." + init;
+        symbolInstance.name = layerName + " " + "@" + _defaultSection + "." + init;
+        symbolStickersMetaData.push(metaData);
+
+        allSymbolInstances.push(symbolInstance);
       }
-
-      metaData = {};
-      metaData.name = "@" + _defaultSection + "." + init;
-      symbolInstance.name = layerName + " " + "@" + _defaultSection + "." + init;
-      symbolStickersMetaData.push(metaData);
-
-      allSymbolInstances.push(symbolInstance);
     }
 
     parsedMetadata = parseStickerMetadata(getStickersMetadata(symbolStickersMetaData));
@@ -437,7 +422,7 @@ function getStickersMetadata(stickersMetaData) {
   var sectionPrefix = '!StickerSection ';
   var title = 'title: ';
   var hideNames = 'hideNames: false';
-  var description = 'description: You will find all of your symbols here.';
+  var description = 'description: All of your symbols show up here. You can define your own groupings. Follow below link to see how to define new sections. <br/><br/> <a class="sticker-root-section__link" href="https://github.com/pratikjshah/symbol-browser/wiki/Getting-started-with-Symbols-Browser#32-define-categories" style="text-alignn:center;">How to create custom groups for Symbols?</a>';
   var backgroundEach = "backgroundEach: '#ffffff'";
   var layout = 'layout: row';
   var yamlStickersMetadata = '';

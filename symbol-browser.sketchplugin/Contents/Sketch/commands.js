@@ -25486,233 +25486,6 @@ module.exports = EventEmitter
 
 /***/ }),
 
-/***/ "./node_modules/sketch-polyfill-fetch/lib/index.js":
-/*!*********************************************************!*\
-  !*** ./node_modules/sketch-polyfill-fetch/lib/index.js ***!
-  \*********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(Promise) {/* globals NSJSONSerialization NSJSONWritingPrettyPrinted NSDictionary NSHTTPURLResponse NSString NSASCIIStringEncoding NSUTF8StringEncoding coscript NSURL NSMutableURLRequest NSMutableData NSURLConnection */
-var _ObjCClass = __webpack_require__(/*! cocoascript-class */ "./node_modules/cocoascript-class/lib/index.js")
-
-var ObjCClass = _ObjCClass.default
-var Buffer
-try {
-  Buffer = __webpack_require__(/*! buffer */ "buffer").Buffer
-} catch (err) {}
-
-function response (httpResponse, data) {
-  var keys = []
-  var all = []
-  var headers = {}
-  var header
-
-  for (var i = 0; i < httpResponse.allHeaderFields().allKeys().length; i++) {
-    var key = httpResponse.allHeaderFields().allKeys()[i].toLowerCase()
-    var value = String(httpResponse.allHeaderFields()[key])
-    keys.push(key)
-    all.push([key, value])
-    header = headers[key]
-    headers[key] = header ? (header + ',' + value) : value
-  }
-
-  return {
-    ok: (httpResponse.statusCode() / 200 | 0) == 1, // 200-399
-    status: Number(httpResponse.statusCode()),
-    statusText: NSHTTPURLResponse.localizedStringForStatusCode(httpResponse.statusCode()),
-    useFinalURL: true,
-    url: String(httpResponse.URL().absoluteString()),
-    clone: response.bind(this, httpResponse, data),
-    text: function () {
-      return new Promise(function (resolve, reject) {
-        const str = NSString.alloc().initWithData_encoding(data, NSASCIIStringEncoding)
-        if (str) {
-          resolve(str)
-        } else {
-          reject(new Error("Couldn't parse body"))
-        }
-      })
-    },
-    json: function () {
-      return new Promise(function (resolve, reject) {
-        var str = NSString.alloc().initWithData_encoding(data, NSUTF8StringEncoding)
-        if (str) {
-          // parse errors are turned into exceptions, which cause promise to be rejected
-          var obj = JSON.parse(str)
-          resolve(obj)
-        } else {
-          reject(new Error('Could not parse JSON because it is not valid UTF-8 data.'))
-        }
-      })
-    },
-    blob: function () {
-      return Promise.resolve(data)
-    },
-    arrayBuffer: function() {
-      return Promise.resolve(Buffer.from(data))
-    },
-    headers: {
-      keys: function () { return keys },
-      entries: function () { return all },
-      get: function (n) { return headers[n.toLowerCase()] },
-      has: function (n) { return n.toLowerCase() in headers }
-    }
-  }
-}
-
-// We create one ObjC class for ourselves here
-var DelegateClass
-
-function fetch (urlString, options) {
-  if (typeof urlString === 'object' && (!urlString.isKindOfClass || !urlString.isKindOfClass(NSString))) {
-    options = urlString
-    urlString = options.url
-  }
-  options = options || {}
-  if (!urlString) {
-    return Promise.reject('Missing URL')
-  }
-  var fiber
-  try {
-    fiber = coscript.createFiber()
-  } catch (err) {
-    coscript.shouldKeepAround = true
-  }
-  return new Promise(function (resolve, reject) {
-    var url = NSURL.alloc().initWithString(urlString)
-    var request = NSMutableURLRequest.requestWithURL(url)
-    request.setHTTPMethod(options.method || 'GET')
-
-    Object.keys(options.headers || {}).forEach(function (i) {
-      request.setValue_forHTTPHeaderField(options.headers[i], i)
-    })
-
-    if (options.body) {
-      var data
-      if (typeof options.body === 'string') {
-        var str = NSString.alloc().initWithString(options.body)
-        data = str.dataUsingEncoding(NSUTF8StringEncoding)
-      } else if (Buffer && Buffer.isBuffer(options.body)) {
-        data = options.body.toNSData()
-      } else if (options.body.isKindOfClass && (options.body.isKindOfClass(NSData) == 1) ) {
-        data = options.body
-      } else if (options.body._isFormData) {
-        var boundary = options.body._boundary
-        data = options.body._data
-        data.appendData(
-          NSString.alloc()
-            .initWithString("--" + boundary + "--\r\n")
-            .dataUsingEncoding(NSUTF8StringEncoding)
-        )
-        request.setValue_forHTTPHeaderField('multipart/form-data; boundary=' + boundary, 'Content-Type')
-      } else {
-        var error
-        data = NSJSONSerialization.dataWithJSONObject_options_error(options.body, NSJSONWritingPrettyPrinted, error)
-        if (error != null) {
-          return reject(error)
-        }
-        request.setValue_forHTTPHeaderField('' + data.length(), 'Content-Length')
-      }
-      request.setHTTPBody(data)
-    }
-
-    if (options.cache) {
-      switch (options.cache) {
-        case 'reload':
-        case 'no-cache':
-        case 'no-store': {
-          request.setCachePolicy(1) // NSURLRequestReloadIgnoringLocalCacheData
-        }
-        case 'force-cache': {
-          request.setCachePolicy(2) // NSURLRequestReturnCacheDataElseLoad
-        }
-        case 'only-if-cached': {
-          request.setCachePolicy(3) // NSURLRequestReturnCacheDataElseLoad
-        }
-      }
-    }
-
-
-    if (!options.credentials) {
-      request.setHTTPShouldHandleCookies(false)
-    }
-
-    if (!DelegateClass) {
-      DelegateClass = ObjCClass({
-        classname: 'FetchPolyfillDelegate',
-        data: null,
-        httpResponse: null,
-        fiber: null,
-        callbacks: null,
-
-        'connectionDidFinishLoading:': function (connection) {
-          this.callbacks.succeed(this.httpResponse, this.data)
-          if (this.fiber) {
-            this.fiber.cleanup()
-          } else {
-            coscript.shouldKeepAround = false
-          }
-        },
-        'connection:didReceiveResponse:': function (connection, httpResponse) {
-          this.httpResponse = httpResponse
-          this.data = NSMutableData.alloc().init()
-        },
-        'connection:didFailWithError:': function (connection, error) {
-          this.callbacks.fail(error)
-          if (this.fiber) {
-            this.fiber.cleanup()
-          } else {
-            coscript.shouldKeepAround = false
-          }
-        },
-        'connection:didReceiveData:': function (connection, data) {
-          this.data.appendData(data)
-        }
-      })
-    }
-
-    var finished = false
-
-    function succeed(res, data) {
-      finished = true
-      resolve(response(res, data))
-    }
-
-    function fail(err) {
-      finished = true
-      reject(err)
-    }
-
-    var connectionDelegate = DelegateClass.new()
-    connectionDelegate.callbacks = NSDictionary.dictionaryWithDictionary({
-      succeed: succeed,
-      fail: fail,
-    })
-    connectionDelegate.fiber = fiber;
-
-    var connection = NSURLConnection.alloc().initWithRequest_delegate(
-      request,
-      connectionDelegate
-    )
-
-    if (fiber) {
-      fiber.onCleanup(function () {
-        if (!finished) {
-          connection.cancel()
-        }
-      })
-    }
-
-  })
-}
-
-module.exports = fetch
-
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/promise-polyfill/lib/index.js */ "./node_modules/promise-polyfill/lib/index.js")))
-
-/***/ }),
-
 /***/ "./node_modules/timers-browserify/main.js":
 /*!************************************************!*\
   !*** ./node_modules/timers-browserify/main.js ***!
@@ -25945,13 +25718,13 @@ if (!global._babelPolyfill) {
 
 
 function onShowStickers(context) {
-  // handler.init(context);
+  _handler__WEBPACK_IMPORTED_MODULE_2__["init"](context);
   var window = new _stickers_ui_js__WEBPACK_IMPORTED_MODULE_0__["StickersUI"](context);
   window.showHide();
   _handler__WEBPACK_IMPORTED_MODULE_2__["trackEvent"]("Stickers", "onShowHideStickers", 1);
 }
 function onClearCache(context) {
-  // handler.init(context);
+  _handler__WEBPACK_IMPORTED_MODULE_2__["init"](context);
   _util__WEBPACK_IMPORTED_MODULE_1__["rmdirRecursive"](_util__WEBPACK_IMPORTED_MODULE_1__["getPluginCachePath"]());
   context.document.showMessage("\u2705 Symbol index cleared");
   _handler__WEBPACK_IMPORTED_MODULE_2__["trackEvent"]("Stickers", "onClearCache", 1);
@@ -25969,7 +25742,7 @@ function onClearCache(context) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function(fetch) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "onAction", function() { return onAction; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "onAction", function() { return onAction; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "onOpenDocument", function() { return onOpenDocument; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "checkForUpdate", function() { return checkForUpdate; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "openDocumentation", function() { return openDocumentation; });
@@ -26005,7 +25778,7 @@ __webpack_require__.r(__webpack_exports__);
  */
 
 var globalContext;
-var remoteManifestUrl = "https://raw.githubusercontent.com/pratikjshah/symbol-browser/master/symbol-browser.sketchplugin/Contents/Resources/user.config";
+var remoteManifestUrl = "https://raw.githubusercontent.com/pratikjshah/symbol-browser/master/symbol-browser.sketchplugin/Contents/Sketch/manifest.json";
 var localDataPath;
 var userConfig;
 var pluginRoot;
@@ -26017,6 +25790,7 @@ var timeout = __webpack_require__(/*! @skpm/timers */ "./node_modules/@skpm/time
 function onAction(context) {// console.log("Action: " + context.action);
 }
 function onOpenDocument(context) {
+  globalContext = context;
   init(context);
   networkRequest(remoteManifestUrl, manageDailyUpdateCheck);
   trackEvent("onAction", "onOpenDocument", 1);
@@ -26057,15 +25831,17 @@ function manageUpdate(remoteManifest, isDailyCheck) {
   /*if (userConfig.localVersion != remoteManifest.version) {
   	showMsg(userConfig.name + ": "+ userConfig.localVersion + " is out of date! Please check for updates.");
   }*/
-  if (remoteManifest.localVersion) {
-    if (userConfig.localVersion === remoteManifest.localVersion) {
+  var localVersion = globalContext.plugin.version();
+
+  if (remoteManifest.version) {
+    if (localVersion === remoteManifest.version) {
       if (!isDailyCheck) {
-        showMsg("🤘Yo🤘! You are using the latest version of " + userConfig.name);
+        showMsg("🤘Yo🤘! You are using the latest version of " + remoteManifest.name);
       }
 
       setUpdateCheckDayOnTomorrow();
     } else {
-      showMsg("Hey👋! New version of " + userConfig.name + " is available!"); //showAvailableUpdateDialog();
+      showMsg("Hey👋! New version of " + remoteManifest.name + " is available!"); //showAvailableUpdateDialog();
 
       setUpdateCheckDayOnTomorrow();
     }
@@ -26142,47 +25918,115 @@ function readLocalData(path) {
   }
 }
 function networkRequest(url, callBackFun) {
+  /*
   // console.log("in networkRequest: \n" + url + " \n " + callBackFun);
-  return fetch(url).then(function (response) {
-    if (!response.ok) {
-      throw Error(response.statusText);
-    }
+  return fetch(url)
+   .then(function (response) {
+  	  if (!response.ok) {
+  	    throw Error(response.statusText);
+  	  }
+  	  return response;
+  	})
+   .then(function (response) {
+  	  return response.json();
+  	})
+   .then(function (result) {
+  	  console.log('Response Params: \n url: ' + url + " \n callBackFun: " + callBackFun);
+  	  console.log(result);
+  	  if(callBackFun !== 'undefined') {
+  	  	callBackFun(result);
+  	  }
+  	  return result;
+  	})
+   .catch(function (error) {
+  	  console.log('Params: \n url: ' + url + " \n callBackFun: " + callBackFun);
+  	  console.log('Looks like there was a problem: \n', error);
+  	});
+     */
+  try {
+    var url = NSURL.URLWithString("" + url);
+    var data = NSData.dataWithContentsOfURL(url);
+    var json = NSJSONSerialization.JSONObjectWithData_options_error(data, 0, nil); // log("parsed data / json");
+    // log(json);
+    // console.log('Params: \n url: ' + url + " \n callBackFun: " + callBackFun);
 
-    return response;
-  }).then(function (response) {
-    return response.json();
-  }).then(function (result) {
-    // console.log('Response Params: \n url: ' + url + " \n callBackFun: " + callBackFun);
-    // console.log(result);
-    if (callBackFun !== 'undefined') {
-      callBackFun(result);
-    }
-
-    return result;
-  }).catch(function (error) {// console.log('Params: \n url: ' + url + " \n callBackFun: " + callBackFun);
-    // console.log('Looks like there was a problem: \n', error);
-  });
+    callBackFun(json);
+  } catch (e) {
+    log("Exception: " + e);
+  }
 }
 function trackEvent(action, label, value) {
-  var kUUIDKey = 'google.analytics.uuid';
-  var uuid = NSUserDefaults.standardUserDefaults().objectForKey(kUUIDKey);
-
+  /*
+  var kUUIDKey = 'google.analytics.uuid'
+  var uuid = NSUserDefaults.standardUserDefaults().objectForKey(kUUIDKey)
   if (!uuid) {
-    uuid = NSUUID.UUID().UUIDString();
-    NSUserDefaults.standardUserDefaults().setObject_forKey(uuid, kUUIDKey);
+    uuid = NSUUID.UUID().UUIDString()
+    NSUserDefaults.standardUserDefaults().setObject_forKey(uuid, kUUIDKey)
   }
-
-  var tid = "UA-64818389-8";
+   var tid = "UA-64818389-8";
   var cid = uuid;
   var ds = "Sketch-" + NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString");
   var baseURL = "https://www.google-analytics.com/debug/collect?v=1&ds=" + ds + "&t=event&tid=" + tid + "&cid=" + cid;
-  baseURL = "https://www.google-analytics.com/collect?v=1&ds=" + ds + "&t=event&tid=" + tid + "&cid=" + cid; // var version = userConfig.localVersion;
-
+  baseURL = "https://www.google-analytics.com/collect?v=1&ds=" + ds + "&t=event&tid=" + tid + "&cid=" + cid;
   var version = context.plugin.version().UTF8String();
-  var trackingURL = baseURL + "&ec=SketchSymbolBrowser-" + version + "&ea=" + action + "&el=" + label + "&ev=" + value;
-  networkRequest(trackingURL);
+   var trackingURL = baseURL + "&ec=SketchSymbolBrowser-" + version + "&ea=" + action + "&el=" + label + "&ev=" + value;
+  // networkRequest(trackingURL);
+  */
+  // console.log("globalContext");
+  // console.log(globalContext);
+  var trackingID = "UA-64818389-8";
+  var userDefaults = NSUserDefaults.standardUserDefaults();
+  var uuidKey = "google.analytics.uuid";
+  var uuid = userDefaults.objectForKey(uuidKey);
+
+  if (!uuid) {
+    uuid = NSUUID.UUID().UUIDString();
+    userDefaults.setObject_forKey(uuid, uuidKey);
+    userDefaults.synchronize();
+  }
+
+  var appName = encodeURI(globalContext.plugin.name()),
+      appId = globalContext.plugin.identifier(),
+      appVersion = globalContext.plugin.version();
+  var url = "https://www.google-analytics.com/collect?v=1"; // Tracking ID
+
+  url += "&tid=" + trackingID; // Source
+
+  url += "&ds=sketch" + MSApplicationMetadata.metadata().appVersion; // Client ID
+
+  url += "&cid=" + uuid; // User GEO location
+
+  url += "&geoid=" + NSLocale.currentLocale().countryCode(); // User language
+
+  url += "&ul=" + NSLocale.currentLocale().localeIdentifier().toLowerCase(); // pageview, screenview, event, transaction, item, social, exception, timing
+
+  url += "&t=event"; // App Name
+
+  url += "&an=" + appName; // App ID
+
+  url += "&aid=" + appId; // App Version
+
+  url += "&av=" + appVersion; // Event category
+
+  url += "&ec=" + encodeURI("SketchSymbolBrowser-" + appVersion); // Event action
+  // url += "&ea=" + encodeURI(eventAction);
+
+  url += "&ea=" + encodeURI(action); // Event label
+  // if (eventLabel) {
+  //     url += "&el=" + encodeURI(eventLabel);
+  // }
+
+  url += "&el=" + encodeURI(label); // Event value
+  // if (eventValue) {
+  //     url += "&ev=" + encodeURI(eventValue);
+  // }
+
+  url += "&ev=" + encodeURI(value); // console.log("new ga url: " + url);
+
+  var session = NSURLSession.sharedSession();
+  var task = session.dataTaskWithURL(NSURL.URLWithString(NSString.stringWithString(url)));
+  task.resume();
 }
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/sketch-polyfill-fetch/lib/index.js */ "./node_modules/sketch-polyfill-fetch/lib/index.js")))
 
 /***/ }),
 
@@ -26480,39 +26324,25 @@ function _buildStickerIndexForLibrary() {
               symbolLayer = _step3.value;
               // var symbolInstance = symbolLayer.newSymbolInstance();
               symbolInstance = symbolLayer;
-              layerName = symbolInstance.name() + ""; // var ranges = [
-              //               '\ud83c[\udf00-\udfff]', // U+1F300 to U+1F3FF
-              //               '\ud83d[\udc00-\ude4f]', // U+1F400 to U+1F64F
-              //               '\ud83d[\ude80-\udeff]'  // U+1F680 to U+1F6FF
-              //             ];
-              // layerName = layerName.replace(new RegExp(ranges.join('|'), 'g'), '').replace(/[&#,+()$~%.'":*?<>{}-]/g, '');
+              layerName = symbolInstance.name() + "";
 
-              layerName = layerName.replace(/[^a-zA-Z0-9 \/_]/g, '');
+              if (layerName.indexOf("@") < 0) {
+                layerName = layerName.replace(/[^a-zA-Z0-9 \/_]/g, '');
 
-              if (layerName.lastIndexOf("/") > 0) {
-                init = layerName.substring(0, layerName.lastIndexOf("/") + 0).replace(/\s\s+/g, ' ').replace(/\//g, '_').replace(/\s/g, '');
-                last = layerName.substring(layerName.lastIndexOf("/") + 1, layerName.length);
-              } else {
-                // var layerSpliter = "/";
-                // var layerSpliterCount = ((layerName.match(/[\/]/g,) || []).length);
-                // if(layerSpliterCount > 0) {
-                //   if(layerSpliterCount >= 3) {
-                //     var position = getPosition(layerName, layerSpliter, Math.min(3, Math.floor(layerSpliterCount/2)));
-                //   } else {
-                //     var position = layerName.indexOf(layerSpliter);
-                //   }
-                //   init = (layerName.substring(0, position + 0)).replace(/\s\s+/g, ' ').replace(/\//g,'_').replace(/\s/g,'');
-                //   last = layerName.substring(position, layerName.length);
-                // } else {
-                init = layerName.replace(/\s/g, '');
-                last = layerName;
+                if (layerName.lastIndexOf("/") > 0) {
+                  init = layerName.substring(0, layerName.lastIndexOf("/") + 0).replace(/\s\s+/g, ' ').replace(/\//g, '_').replace(/\s/g, '');
+                  last = layerName.substring(layerName.lastIndexOf("/") + 1, layerName.length);
+                } else {
+                  init = layerName.replace(/\s/g, '');
+                  last = layerName;
+                }
+
+                metaData = {};
+                metaData.name = "@" + _defaultSection + "." + init;
+                symbolInstance.name = layerName + " " + "@" + _defaultSection + "." + init;
+                symbolStickersMetaData.push(metaData);
+                allSymbolInstances.push(symbolInstance);
               }
-
-              metaData = {};
-              metaData.name = "@" + _defaultSection + "." + init;
-              symbolInstance.name = layerName + " " + "@" + _defaultSection + "." + init;
-              symbolStickersMetaData.push(metaData);
-              allSymbolInstances.push(symbolInstance);
             }
 
             _context3.next = 22;
@@ -27050,7 +26880,7 @@ function getStickersMetadata(stickersMetaData) {
   var sectionPrefix = '!StickerSection ';
   var title = 'title: ';
   var hideNames = 'hideNames: false';
-  var description = 'description: You will find all of your symbols here.';
+  var description = 'description: All of your symbols show up here. You can define your own groupings. Follow below link to see how to define new sections. <br/><br/> <a class="sticker-root-section__link" href="https://github.com/pratikjshah/symbol-browser/wiki/Getting-started-with-Symbols-Browser#32-define-categories" style="text-alignn:center;">How to create custom groups for Symbols?</a>';
   var backgroundEach = "backgroundEach: '#ffffff'";
   var layout = 'layout: row';
   var yamlStickersMetadata = '';
@@ -27166,8 +26996,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
-var THREAD_DICT_KEY = 'stickers.BrowserWindow';
-var UI_MODE = 'cover'; // MSTheme.sharedTheme().isDark()
+var THREAD_DICT_KEY = 'stickers.BrowserWindow'; // const UI_MODE = 'cover';
+
+var UI_MODE = 'modal'; // MSTheme.sharedTheme().isDark()
 
 var DARK_MODE = NSAppKitVersionNumber >= 1671 && 'Dark' === String(NSUserDefaults.standardUserDefaults().stringForKey('AppleInterfaceStyle'));
 var BUILD_SKETCH_53_BETA_1 = 71402;
@@ -27191,8 +27022,9 @@ function () {
       var browserWindow = this.getPersistedObj();
 
       if (browserWindow) {
-        browserWindow.close();
-        this.setPersistedObj(null);
+        browserWindow.focus(); // browserWindow.moveTop();
+        // browserWindow.close();
+        // this.setPersistedObj(null);
       } else {
         this.createAndShow();
       }
@@ -27241,11 +27073,13 @@ function () {
       this.browserWindow = new sketch_module_web_view__WEBPACK_IMPORTED_MODULE_2___default.a({
         backgroundColor: '#ffffffff',
         identifier: 'stickers.web',
-        width: 800,
-        height: 600,
+        width: 1200,
+        height: 800,
         show: false,
-        frame: UI_MODE == 'palette',
-        hasShadow: UI_MODE == 'palette',
+        frame: UI_MODE == 'modal',
+        modal: UI_MODE == 'modal',
+        hasShadow: UI_MODE == 'modal',
+        title: 'Symbol Browser [BETA]',
         acceptsFirstMouse: true
       });
       this.webContents = this.browserWindow.webContents;
@@ -27264,11 +27098,20 @@ function () {
         this.browserWindow._panel.setHidesOnDeactivate(false);
       }
 
+      if (UI_MODE == 'modal') {
+        this.browserWindow.setResizable(true); // this.browserWindow._panel.setFrame_display_animate_(docWindow.frame(), false, false);
+
+        this.browserWindow._panel.setHidesOnDeactivate(false);
+      }
+
       this.browserWindow.once('ready-to-show', function () {
         _this.browserWindow.show();
 
         if (UI_MODE == 'cover') {
           docWindow.addChildWindow_ordered_(_this.browserWindow._panel, NSWindowAbove);
+        }
+
+        if (UI_MODE == 'modal') {// docWindow.addChildWindow_ordered_(this.browserWindow._panel, NSWindowAbove);
         }
       });
       this.browserWindow.loadURL(String(this.context.plugin.urlForResourceNamed('index.html') + "?uiMode=".concat(UI_MODE, "&darkMode=").concat(DARK_MODE ? 1 : 0)));
@@ -27341,6 +27184,9 @@ function () {
 
         if (UI_MODE == 'cover') {
           _this2.browserWindow.close();
+        }
+
+        if (UI_MODE == 'modal') {// this.browserWindow.close();
         }
       }); // add a handler for a call from web content's javascript
 

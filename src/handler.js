@@ -17,7 +17,7 @@
 import sketch from 'sketch'
 
 var globalContext;
-var remoteManifestUrl = "https://raw.githubusercontent.com/pratikjshah/symbol-browser/master/symbol-browser.sketchplugin/Contents/Resources/user.config";
+var remoteManifestUrl = "https://raw.githubusercontent.com/pratikjshah/symbol-browser/master/symbol-browser.sketchplugin/Contents/Sketch/manifest.json";
 var localDataPath;
 var userConfig;
 var pluginRoot;
@@ -31,6 +31,7 @@ export function onAction(context) {
 }
 
 export function onOpenDocument(context) {
+  globalContext = context;
 	init(context);
     networkRequest(remoteManifestUrl, manageDailyUpdateCheck);
     trackEvent("onAction", "onOpenDocument", 1);
@@ -82,14 +83,15 @@ export function manageUpdate(remoteManifest, isDailyCheck) {
 		showMsg(userConfig.name + ": "+ userConfig.localVersion + " is out of date! Please check for updates.");
 	}*/
 
-    if (remoteManifest.localVersion) {
-        if (userConfig.localVersion === remoteManifest.localVersion) {
+    var localVersion = globalContext.plugin.version();
+    if (remoteManifest.version) {
+        if (localVersion === remoteManifest.version) {
         	if(!isDailyCheck) {
-        		showMsg("🤘Yo🤘! You are using the latest version of " + userConfig.name);
+        		showMsg("🤘Yo🤘! You are using the latest version of " + remoteManifest.name);
         	}
           setUpdateCheckDayOnTomorrow();
         } else {
-          showMsg("Hey👋! New version of " + userConfig.name + " is available!");
+          showMsg("Hey👋! New version of " + remoteManifest.name + " is available!");
           //showAvailableUpdateDialog();
           setUpdateCheckDayOnTomorrow();
         }
@@ -172,6 +174,8 @@ export function readLocalData(path) {
 
 export function networkRequest(url, callBackFun) {
 
+  /*
+
 	// console.log("in networkRequest: \n" + url + " \n " + callBackFun);
 
 	return fetch(url)
@@ -185,20 +189,35 @@ export function networkRequest(url, callBackFun) {
 			  return response.json();
 			})
 	  .then(function (result) {
-			  // console.log('Response Params: \n url: ' + url + " \n callBackFun: " + callBackFun);
-			  // console.log(result);
+			  console.log('Response Params: \n url: ' + url + " \n callBackFun: " + callBackFun);
+			  console.log(result);
 			  if(callBackFun !== 'undefined') {
 			  	callBackFun(result);
 			  }
 			  return result;
 			})
 	  .catch(function (error) {
-			  // console.log('Params: \n url: ' + url + " \n callBackFun: " + callBackFun);
-			  // console.log('Looks like there was a problem: \n', error);
+			  console.log('Params: \n url: ' + url + " \n callBackFun: " + callBackFun);
+			  console.log('Looks like there was a problem: \n', error);
 			});
+
+    */
+
+    try {
+      var url = NSURL.URLWithString(""+url);
+      var data = NSData.dataWithContentsOfURL(url);
+      var json = NSJSONSerialization.JSONObjectWithData_options_error(data, 0, nil);
+      // log("parsed data / json");
+      // log(json);
+      // console.log('Params: \n url: ' + url + " \n callBackFun: " + callBackFun);
+      callBackFun(json);
+    } catch(e) {
+      log("Exception: " + e);
+    }
 }
 
 export function trackEvent(action, label, value) {
+    /*
     var kUUIDKey = 'google.analytics.uuid'
     var uuid = NSUserDefaults.standardUserDefaults().objectForKey(kUUIDKey)
     if (!uuid) {
@@ -211,10 +230,68 @@ export function trackEvent(action, label, value) {
     var ds = "Sketch-" + NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString");
     var baseURL = "https://www.google-analytics.com/debug/collect?v=1&ds=" + ds + "&t=event&tid=" + tid + "&cid=" + cid;
     baseURL = "https://www.google-analytics.com/collect?v=1&ds=" + ds + "&t=event&tid=" + tid + "&cid=" + cid;
-    // var version = userConfig.localVersion;
     var version = context.plugin.version().UTF8String();
 
     var trackingURL = baseURL + "&ec=SketchSymbolBrowser-" + version + "&ea=" + action + "&el=" + label + "&ev=" + value;
-    networkRequest(trackingURL);
+    // networkRequest(trackingURL);
+    */
 
+    // console.log("globalContext");
+    // console.log(globalContext);
+
+    var trackingID = "UA-64818389-8";
+    var userDefaults = NSUserDefaults.standardUserDefaults();
+
+    var uuidKey = "google.analytics.uuid";
+    var uuid = userDefaults.objectForKey(uuidKey);
+    if (!uuid) {
+        uuid = NSUUID.UUID().UUIDString();
+        userDefaults.setObject_forKey(uuid, uuidKey);
+        userDefaults.synchronize();
+    }
+
+    var appName = encodeURI(globalContext.plugin.name()),
+        appId = globalContext.plugin.identifier(),
+        appVersion = globalContext.plugin.version();
+
+    var url = "https://www.google-analytics.com/collect?v=1";
+    // Tracking ID
+    url += "&tid=" + trackingID;
+    // Source
+    url += "&ds=sketch" + MSApplicationMetadata.metadata().appVersion;
+    // Client ID
+    url += "&cid=" + uuid;
+    // User GEO location
+    url += "&geoid=" + NSLocale.currentLocale().countryCode();
+    // User language
+    url += "&ul=" + NSLocale.currentLocale().localeIdentifier().toLowerCase();
+    // pageview, screenview, event, transaction, item, social, exception, timing
+    url += "&t=event";
+    // App Name
+    url += "&an=" + appName;
+    // App ID
+    url += "&aid=" + appId;
+    // App Version
+    url += "&av=" + appVersion;
+    // Event category
+    url += "&ec=" + encodeURI("SketchSymbolBrowser-" + appVersion);
+    // Event action
+    // url += "&ea=" + encodeURI(eventAction);
+    url += "&ea=" + encodeURI(action);
+    // Event label
+    // if (eventLabel) {
+    //     url += "&el=" + encodeURI(eventLabel);
+    // }
+    url += "&el=" + encodeURI(label);
+    // Event value
+    // if (eventValue) {
+    //     url += "&ev=" + encodeURI(eventValue);
+    // }
+    url += "&ev=" + encodeURI(value);
+
+    // console.log("new ga url: " + url);
+
+    var session = NSURLSession.sharedSession();
+    var task = session.dataTaskWithURL(NSURL.URLWithString(NSString.stringWithString(url)));
+    task.resume();
 }

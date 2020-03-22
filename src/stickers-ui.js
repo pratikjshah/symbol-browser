@@ -25,7 +25,8 @@ import * as colorUtil from './color-util';
 import {makeStickerIndexForLibraries} from './sticker-index';
 
 const THREAD_DICT_KEY = 'stickers.BrowserWindow';
-const UI_MODE = 'cover';
+// const UI_MODE = 'cover';
+const UI_MODE = 'modal';
 // MSTheme.sharedTheme().isDark()
 const DARK_MODE = (NSAppKitVersionNumber >= 1671 &&
     'Dark' === String(NSUserDefaults.standardUserDefaults().stringForKey('AppleInterfaceStyle')));
@@ -44,8 +45,10 @@ export class StickersUI {
   showHide() {
     let browserWindow = this.getPersistedObj();
     if (browserWindow) {
-      browserWindow.close();
-      this.setPersistedObj(null);
+      browserWindow.focus();
+      // browserWindow.moveTop();
+      // browserWindow.close();
+      // this.setPersistedObj(null);
     } else {
       this.createAndShow();
     }
@@ -88,11 +91,13 @@ export class StickersUI {
     this.browserWindow = new BrowserWindow({
       backgroundColor: '#ffffffff',
       identifier: 'stickers.web',
-      width: 800,
-      height: 600,
+      width: 1200,
+      height: 800,
       show: false,
-      frame: UI_MODE == 'palette',
-      hasShadow: UI_MODE == 'palette',
+      frame: UI_MODE == 'modal',
+      modal: UI_MODE == 'modal',
+      hasShadow: UI_MODE == 'modal',
+      title: 'Symbol Browser [BETA]',
       acceptsFirstMouse: true,
     });
 
@@ -111,10 +116,18 @@ export class StickersUI {
       this.browserWindow._panel.setFrame_display_animate_(docWindow.frame(), false, false);
       this.browserWindow._panel.setHidesOnDeactivate(false);
     }
+    if (UI_MODE == 'modal') {
+      this.browserWindow.setResizable(true);
+      // this.browserWindow._panel.setFrame_display_animate_(docWindow.frame(), false, false);
+      this.browserWindow._panel.setHidesOnDeactivate(false);
+    }
     this.browserWindow.once('ready-to-show', () => {
       this.browserWindow.show();
       if (UI_MODE == 'cover') {
         docWindow.addChildWindow_ordered_(this.browserWindow._panel, NSWindowAbove);
+      }
+      if (UI_MODE == 'modal') {
+        // docWindow.addChildWindow_ordered_(this.browserWindow._panel, NSWindowAbove);
       }
     });
 
@@ -177,6 +190,9 @@ export class StickersUI {
       }
       if (UI_MODE == 'cover') {
         this.browserWindow.close();
+      }
+      if (UI_MODE == 'modal') {
+        // this.browserWindow.close();
       }
     });
 
