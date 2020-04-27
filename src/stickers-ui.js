@@ -52,6 +52,7 @@ export class StickersUI {
       // this.setPersistedObj(null);
     } else {
       this.createAndShow();
+      this.context.document.showMessage(`⌛️ Initializing Symbol Browser...`);
     }
   }
 
