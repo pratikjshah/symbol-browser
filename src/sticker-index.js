@@ -56,8 +56,8 @@ export async function makeStickerIndexForLibraries({onProgress}) {
         }
         return firstWithId;
       });
-      log("filttered libraries");
-      log(libraries);
+      // log("filttered libraries");
+      // log(libraries);
 
   let progressReporter = new ProgressReporter();
   progressReporter.on('progress', progress => onProgress(progress));
@@ -107,6 +107,7 @@ export async function makeStickerIndexForLibraries({onProgress}) {
       if (colors.length) {
         libraryIndex.colors = Array.from(colors).map(c => colorUtil.msColorToSVGColor(c));
       }
+      
 
       // cache the index
       util.mkdirpSync(path.dirname(indexCachePath));
@@ -170,15 +171,23 @@ async function buildStickerIndexForLibrary(libraryId, defaultLibName, document, 
 
         metaData = {};
         metaData.name = "@" + _defaultSection + "." + init;
-        symbolInstance.name = layerName + " " + "@" + _defaultSection + "." + init;
+        // symbolInstance.name = layerName + " " + "@" + _defaultSection + "." + init;
         symbolStickersMetaData.push(metaData);
 
         allSymbolInstances.push(symbolInstance);
+        // symbolInstance.name = layerName;
       }
     }
 
+    // log('symbolStickersMetaData');
+    // log(symbolStickersMetaData);
+    // log('getStickersMetadata(symbolStickersMetaData)');
+    // log(getStickersMetadata(symbolStickersMetaData));
+
     parsedMetadata = parseStickerMetadata(getStickersMetadata(symbolStickersMetaData));
-    
+    // log('parsedMetadata');
+    // log(parsedMetadata);
+
   }
 
   // second, find sticker sections (stored in text layers)
@@ -193,16 +202,21 @@ async function buildStickerIndexForLibrary(libraryId, defaultLibName, document, 
     }
 
     let tempParsedMetadata = parseStickerMetadata(text);
-    log('symbolStickersMetaData');
-    log(parsedMetadata.sections.length);
-    log('otherStickersMetaData');
-    log(tempParsedMetadata.sections.length);
+    // log('symbolStickersMetaData');
+    // log(parsedMetadata.sections.length);
+    // log(parsedMetadata.sections);
+    // log('otherStickersMetaData');
+    // log(tempParsedMetadata.sections.length);
+    // log(tempParsedMetadata.sections);
 
     if(SHOW_DEFAULT_STICKERS) {
       Array.prototype.push.apply(parsedMetadata.sections, tempParsedMetadata.sections);
     } else {
       parsedMetadata.sections = tempParsedMetadata.sections;
     }
+    // log('parsedMetadata.sections');
+    // log(parsedMetadata.sections.length);
+    // log(parsedMetadata.sections);
 
     // Array.prototype.push.apply(parsedMetadata.sections, tempParsedMetadata.sections);
     parsedMetadata.libraryMeta = tempParsedMetadata.libraryMeta;
@@ -213,7 +227,7 @@ async function buildStickerIndexForLibrary(libraryId, defaultLibName, document, 
     section.libraryId = libraryId;
 
     if (section.id in sectionsById) {
-      log(`Duplicate sticker section id ${section.id}, skipping duplicates`);
+      // log(`Duplicate sticker section id ${section.id}, skipping duplicates`);
     } else {
       sectionsById[section.id] = section;
       libraryIndex.sections.push(section);
@@ -257,6 +271,9 @@ async function buildStickerIndexForLibrary(libraryId, defaultLibName, document, 
   // possibleStickers.push.apply(possibleStickers, allSymbolMasters);
   possibleStickers.push.apply(possibleStickers, allSymbolInstances);
 
+  // log('possibleStickers');
+  // log(possibleStickers);
+
   progressReporter.total = possibleStickers.length;
   for (let layer of possibleStickers) {
     progressReporter.increment();
@@ -265,7 +282,15 @@ async function buildStickerIndexForLibrary(libraryId, defaultLibName, document, 
       continue;
     }
 
+    // let parsedName;
+    // if(layer instanceof MSSymbolMaster && !String(layer.name()).startsWith('@')) {
+    //   parsedName = parseLayerName(layer.name(), sectionId => sectionId in sectionsById, true);
+    // } else {
+    //   parsedName = parseLayerName(layer.name(), sectionId => sectionId in sectionsById, false);
+    // }
+
     let parsedName = parseLayerName(layer.name(), sectionId => sectionId in sectionsById);
+    // log(parsedName);
 
     // if this is an icon, capture it as the icon
     if (parsedName.specialInstructions.icon) {
@@ -297,6 +322,7 @@ async function buildStickerIndexForLibrary(libraryId, defaultLibName, document, 
       if (layer instanceof MSSymbolMaster) {
         // convert symbolMaster to symbolInstance
         layer = layer.newSymbolInstance();
+        layerInfo.type = 'symbol';
       }
 
       // capture layer content
@@ -391,6 +417,68 @@ const SPECIAL_INSTRUCTIONS = new Set(['icon']);
  * that returns true if the given section ID (e.g. "@Foo.Bar") is a
  * valid section ID.
  */
+// function parseLayerName(name, isValidSectionIdFn, isSymbol) {
+//   let parsed = {
+//     isSticker: false,
+//     sectionIds: [],
+//     sanitizedName: name,
+//     specialInstructions: {},
+//   };
+
+//   log(name);
+
+//   if(isSymbol) {
+//     name = getSymbolNameWithSectionFn(name);
+//   }
+
+//   name = String(name || '');
+//   let unspecialParts = name
+//       .split(/(@+[\w\.]+)/)
+//       .filter(part => {
+//         if ('@' === part.charAt(0)) {
+//           if ('@' === part.charAt(1)) {
+//             // special instruction
+//             let instr = part.slice(2);
+//             if (SPECIAL_INSTRUCTIONS.has(instr)) {
+//               parsed.specialInstructions[instr] = true;
+//               return false; // remove from sanitized name
+//             }
+//           } else {
+//             // possible section id
+//             if (isValidSectionIdFn(part)) {
+//               parsed.sectionIds.push(part);
+//               parsed.isSticker = true;
+//               return false // remove from sanitized name
+//             } else {
+//                 log(`Sticker section not found ${sectionId} for layer named ${name}`);
+//                 // continue;
+//             }
+//           }
+//         }
+
+//         return true;
+//       });
+
+//   parsed.sanitizedName = unspecialParts.join('').replace(/^\s+|\s+$/g, '').replace(/\s+/, ' ');
+//   return parsed;
+// }
+
+function getSymbolNameWithSectionFn(name) {
+  var init, last, newName;
+  name = name.replace(/[^a-zA-Z0-9 \/_]/g, '');
+  if(name.lastIndexOf("/") > 0) {
+    init = (name.substring(0, name.lastIndexOf("/") + 0)).replace(/\s\s+/g, ' ').replace(/\//g,'_').replace(/\s/g,'');
+    last = name.substring(name.lastIndexOf("/") + 1, name.length);
+  } else {
+    init = name.replace(/\s/g,'');
+    last = name;
+  }
+
+  newName = name + "@" + _defaultSection + "." + init;
+
+  return newName;
+}
+
 function parseLayerName(name, isValidSectionIdFn) {
   let parsed = {
     isSticker: false,
@@ -400,6 +488,11 @@ function parseLayerName(name, isValidSectionIdFn) {
   };
 
   name = String(name || '');
+
+  if(!name.includes("@")) {
+    name = getSymbolNameWithSectionFn(name);
+  }
+
   let unspecialParts = name
       .split(/(@+[\w\.]+)/)
       .filter(part => {
@@ -418,8 +511,8 @@ function parseLayerName(name, isValidSectionIdFn) {
               parsed.isSticker = true;
               return false // remove from sanitized name
             } else {
-              //   log(`Sticker section not found ${sectionId} for layer named ${name}`);
-              //   continue;
+                log(`Sticker section not found ${sectionId} for layer named ${name}`);
+                // continue;
             }
           }
         }
@@ -428,6 +521,7 @@ function parseLayerName(name, isValidSectionIdFn) {
       });
 
   parsed.sanitizedName = unspecialParts.join('').replace(/^\s+|\s+$/g, '').replace(/\s+/, ' ');
+  // log("name: " + name + "    |    sanitizedName: " + parsed.sanitizedName);
   return parsed;
 }
 
