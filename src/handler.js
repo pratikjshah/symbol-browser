@@ -87,16 +87,18 @@ export function manageUpdate(remoteManifest, isDailyCheck) {
     if (remoteManifest.version) {
         if (localVersion === remoteManifest.version) {
         	if(!isDailyCheck) {
-        		showMsg("🤘Yo🤘! You are using the latest version of " + remoteManifest.name);
+        		globalContext.document.showMessage("🤘Yo🤘! You are using the latest version of " + remoteManifest.name);
+            // console.log("🤘Yo🤘! You are using the latest version of " + remoteManifest.name);
         	}
           setUpdateCheckDayOnTomorrow();
         } else {
-          showMsg("Hey👋! New version of " + remoteManifest.name + " is available!");
+          globalContext.document.showMessage("Hey👋! New version of " + remoteManifest.name + " is available!");
+          // console.log("Hey👋! New version of " + remoteManifest.name + " is available!");
           //showAvailableUpdateDialog();
           setUpdateCheckDayOnTomorrow();
         }
     } else {
-      //showMsg("can not check:");
+      //globalContext.document.showMessage("can not check:");
       //showAvailableUpdateDialog();
       setUpdateCheckDayOnTomorrow();
     }
@@ -146,7 +148,9 @@ export function init(context) {
 }
 
 export function showMsg(msg) {
-	globalContext.document.showMessage(msg);
+	// globalContext.document.showMessage(msg);
+  console.log("in showMsg");
+  console.log(msg);
 }
 
 export function openUrlInBrowser(url) {

@@ -15,7 +15,8 @@ input,textarea {
 }
 
 html {
-    cursor: default
+    cursor: default;
+    scroll-behavior: smooth;
 }
 
 .svg-icon {
@@ -82,6 +83,10 @@ html {
 
 [v-cloak] {
     display: none!important
+}
+
+body.no-search-results .sticker-library-container {
+    display: none !important;
 }
 
 body,html {
@@ -1038,7 +1043,7 @@ body[is-dark-theme] .page-loading .zero-state__image {
 <body>
   <div class="root" v-cloak>
     <div class="header-area">
-      <button class="header-area__back-button" v-on:click="closeWindow">
+      <button class="header-area__back-button">
         
         <!-- <svg-icon glyph="arrow_back_ios"></svg-icon>
         <span>Back to Sketch</span> -->
@@ -1075,7 +1080,7 @@ body[is-dark-theme] .page-loading .zero-state__image {
         style="margin-top: 0;">FAQs</a></div>
     </div>
 
-    <div class="navigation-area" v-if="stickerIndex">
+    <div class="navigation-area" v-if="stickerIndex && stickerIndex.libraries.length > 0">
         <div class="library-tabs">
             <div class="library-tab active"
                 data-key="all">
@@ -1173,7 +1178,7 @@ body[is-dark-theme] .page-loading .zero-state__image {
         </span>
         <a class="zero-state__link" href="https://www.sketch.com/docs/libraries/adding-libraries">Learn more</a>
       </div>
-      <div class="zero-state search-empty" v-if="$globals.searchText">
+      <div class="zero-state search-empty" v-if="$globals.searchText && !$globals.anyResults">
         <div class="zero-state__image"><div class="element"></div></div>
         <span class="zero-state__text">
           No symbols or categories matched for <em>'{{ $globals.searchText }}'</em>

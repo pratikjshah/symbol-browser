@@ -6,7 +6,7 @@
   "email": "hello@pratikshah.website",
   "appcast": "https://raw.githubusercontent.com/pratikjshah/symbol-browser/master/appcast.xml",
   "homepage": "http://symbol-browser.pratikshah.website/",
-  "version": "2.15.1",
+  "version": "5.21.1",
   "identifier": "website.pratikshah.symbol-browser",
   "compatibleVersion": "52",
   "bundleVersion": "1",

@@ -319,17 +319,18 @@ function manageUpdate(remoteManifest, isDailyCheck) {
   if (remoteManifest.version) {
     if (localVersion === remoteManifest.version) {
       if (!isDailyCheck) {
-        showMsg("🤘Yo🤘! You are using the latest version of " + remoteManifest.name);
+        globalContext.document.showMessage("🤘Yo🤘! You are using the latest version of " + remoteManifest.name); // console.log("🤘Yo🤘! You are using the latest version of " + remoteManifest.name);
       }
 
       setUpdateCheckDayOnTomorrow();
     } else {
-      showMsg("Hey👋! New version of " + remoteManifest.name + " is available!"); //showAvailableUpdateDialog();
+      globalContext.document.showMessage("Hey👋! New version of " + remoteManifest.name + " is available!"); // console.log("Hey👋! New version of " + remoteManifest.name + " is available!");
+      //showAvailableUpdateDialog();
 
       setUpdateCheckDayOnTomorrow();
     }
   } else {
-    //showMsg("can not check:");
+    //globalContext.document.showMessage("can not check:");
     //showAvailableUpdateDialog();
     setUpdateCheckDayOnTomorrow();
   }
@@ -378,7 +379,9 @@ function init(context) {
 
 }
 function showMsg(msg) {
-  globalContext.document.showMessage(msg);
+  // globalContext.document.showMessage(msg);
+  console.log("in showMsg");
+  console.log(msg);
 }
 function openUrlInBrowser(url) {
   NSWorkspace.sharedWorkspace().openURL(NSURL.URLWithString(url));

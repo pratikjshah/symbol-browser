@@ -29,7 +29,7 @@ import * as util from './util';
 import * as colorUtil from './color-util';
 import {ProgressReporter} from './util-progress-reporter';
 
-const INDEX_FORMAT_VERSION = 4;
+const INDEX_FORMAT_VERSION = 5;
 const FORCE_REBULD = false;
 const SHOW_DEFAULT_STICKERS = true;
 let _defaultSection = 'DefaultSymbols';
