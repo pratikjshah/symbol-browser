@@ -23,6 +23,8 @@ var userConfig;
 var pluginRoot;
 var hasResponseCame = false;
 const timeout = require('@skpm/timers');
+var UI = require('sketch/ui');
+var Settings = require('sketch/settings');
 
 // ===== Menu action handlers ========================
 
@@ -53,7 +55,8 @@ export function openDocumentation(context) {
 
 export function openSampleFile(context) {
 	init(context);
-    openUrlInBrowser("https://sketch.cloud/s/DVnWq");
+    // openUrlInBrowser("https://sketch.cloud/s/DVnWq");
+    openUrlInBrowser("https://www.sketch.com/s/f577ec9e-127a-4c5a-bd26-22ba9ddb64f5");
 }
 
 export function reportIssue(context) {
@@ -87,12 +90,18 @@ export function manageUpdate(remoteManifest, isDailyCheck) {
     if (remoteManifest.version) {
         if (localVersion === remoteManifest.version) {
         	if(!isDailyCheck) {
-        		globalContext.document.showMessage("🤘Yo🤘! You are using the latest version of " + remoteManifest.name);
+        		// globalContext.document.showMessage("🤘Yo🤘! You are using the latest version of " + remoteManifest.name);
+            UI.message("🤘Yo🤘! You are using the latest version of " + remoteManifest.name);
+            Settings.setSettingForKey('hasUpdates', false);
             // console.log("🤘Yo🤘! You are using the latest version of " + remoteManifest.name);
+            // localStorage.setItem("hasUpdates", false);
         	}
           setUpdateCheckDayOnTomorrow();
         } else {
-          globalContext.document.showMessage("Hey👋! New version of " + remoteManifest.name + " is available!");
+          // globalContext.document.showMessage("Hey👋! New version of " + remoteManifest.name + " is available!");
+          UI.message("Hey👋! New version of " + remoteManifest.name + " is available!");
+          Settings.setSettingForKey('hasUpdates', true);
+          // localStorage.setItem("hasUpdates", true);
           // console.log("Hey👋! New version of " + remoteManifest.name + " is available!");
           //showAvailableUpdateDialog();
           setUpdateCheckDayOnTomorrow();

@@ -29,7 +29,7 @@ import * as util from './util';
 import * as colorUtil from './color-util';
 import {ProgressReporter} from './util-progress-reporter';
 
-const INDEX_FORMAT_VERSION = 5;
+const INDEX_FORMAT_VERSION = 6;
 const FORCE_REBULD = false;
 const SHOW_DEFAULT_STICKERS = true;
 let _defaultSection = 'DefaultSymbols';
@@ -159,24 +159,41 @@ async function buildStickerIndexForLibrary(libraryId, defaultLibName, document, 
       var init, last;
       var layerName = symbolInstance.name() + "";
 
-      if(layerName.indexOf("@") < 0) {
-        layerName = layerName.replace(/[^a-zA-Z0-9 \/_]/g, '');
-        if(layerName.lastIndexOf("/") > 0) {
-          init = (layerName.substring(0, layerName.lastIndexOf("/") + 0)).replace(/\s\s+/g, ' ').replace(/\//g,'_').replace(/\s/g,'');
-          last = layerName.substring(layerName.lastIndexOf("/") + 1, layerName.length);
-        } else {
-          init = layerName.replace(/\s/g,'');
-          last = layerName;
-        }
+      // if(layerName.indexOf("@") < 0) {
+      //   layerName = layerName.replace(/[^a-zA-Z0-9 \/_]/g, '');
+      //   if(layerName.lastIndexOf("/") > 0) {
+      //     init = (layerName.substring(0, layerName.lastIndexOf("/") + 0)).replace(/\s\s+/g, ' ').replace(/\//g,'_').replace(/\s/g,'');
+      //     last = layerName.substring(layerName.lastIndexOf("/") + 1, layerName.length);
+      //   } else {
+      //     init = layerName.replace(/\s/g,'');
+      //     last = layerName;
+      //   }
 
-        metaData = {};
-        metaData.name = "@" + _defaultSection + "." + init;
-        // symbolInstance.name = layerName + " " + "@" + _defaultSection + "." + init;
-        symbolStickersMetaData.push(metaData);
+      //   metaData = {};
+      //   metaData.name = "@" + _defaultSection + "." + init;
+      //   // symbolInstance.name = layerName + " " + "@" + _defaultSection + "." + init;
+      //   symbolStickersMetaData.push(metaData);
 
-        allSymbolInstances.push(symbolInstance);
-        // symbolInstance.name = layerName;
+      //   allSymbolInstances.push(symbolInstance);
+      //   // symbolInstance.name = layerName;
+      // }
+
+      layerName = layerName.replace(/[^a-zA-Z0-9 \/_]/g, '');
+      if(layerName.lastIndexOf("/") > 0) {
+        init = (layerName.substring(0, layerName.lastIndexOf("/") + 0)).replace(/\s\s+/g, ' ').replace(/\//g,'_').replace(/\s/g,'');
+        last = layerName.substring(layerName.lastIndexOf("/") + 1, layerName.length);
+      } else {
+        init = layerName.replace(/\s/g,'');
+        last = layerName;
       }
+
+      metaData = {};
+      metaData.name = "@" + _defaultSection + "." + init;
+      // symbolInstance.name = layerName + " " + "@" + _defaultSection + "." + init;
+      symbolStickersMetaData.push(metaData);
+
+      allSymbolInstances.push(symbolInstance);
+      // symbolInstance.name = layerName;
     }
 
     // log('symbolStickersMetaData');
@@ -195,33 +212,54 @@ async function buildStickerIndexForLibrary(libraryId, defaultLibName, document, 
       document,
       NSPredicate.predicateWithFormat('className == %@', 'MSTextLayer'));
   allTextLayers.reverse(); // layer list order, not stacking order
+
+  log("allTextLayers: " + allTextLayers.length);
+  let combinedText = "";
   for (let textLayer of allTextLayers) {
     let text = textLayer.stringValue();
     if (text.indexOf('!Sticker') < 0) {
       continue;
     }
 
-    let tempParsedMetadata = parseStickerMetadata(text);
-    // log('symbolStickersMetaData');
-    // log(parsedMetadata.sections.length);
-    // log(parsedMetadata.sections);
-    // log('otherStickersMetaData');
-    // log(tempParsedMetadata.sections.length);
-    // log(tempParsedMetadata.sections);
+    combinedText = combinedText + " \r\n\r\n\r\n" + text; 
 
-    if(SHOW_DEFAULT_STICKERS) {
-      Array.prototype.push.apply(parsedMetadata.sections, tempParsedMetadata.sections);
-    } else {
-      parsedMetadata.sections = tempParsedMetadata.sections;
-    }
+    // let tempParsedMetadata = parseStickerMetadata(text);
+    // // log('symbolStickersMetaData');
+    // // log(parsedMetadata.sections.length);
+    // // log(parsedMetadata.sections);
+    // // log('otherStickersMetaData');
+    // // log(tempParsedMetadata.sections.length);
+    // // log(tempParsedMetadata.sections);
+
+    // if(SHOW_DEFAULT_STICKERS) {
+    //   Array.prototype.push.apply(parsedMetadata.sections, tempParsedMetadata.sections);
+    // } else {
+    //   parsedMetadata.sections = tempParsedMetadata.sections;
+    // }
     // log('parsedMetadata.sections');
     // log(parsedMetadata.sections.length);
     // log(parsedMetadata.sections);
 
-    // Array.prototype.push.apply(parsedMetadata.sections, tempParsedMetadata.sections);
-    parsedMetadata.libraryMeta = tempParsedMetadata.libraryMeta;
+    // // Array.prototype.push.apply(parsedMetadata.sections, tempParsedMetadata.sections);
+    // parsedMetadata.libraryMeta = tempParsedMetadata.libraryMeta;
 
   }
+
+  // log("combinedText");
+  // log(combinedText);
+  let tempParsedMetadata = parseStickerMetadata(combinedText);
+
+  if(SHOW_DEFAULT_STICKERS) {
+    Array.prototype.push.apply(parsedMetadata.sections, tempParsedMetadata.sections);
+  } else {
+    parsedMetadata.sections = tempParsedMetadata.sections;
+  }
+  // log('parsedMetadata.sections');
+  // log(parsedMetadata.sections.length);
+  // log(parsedMetadata.sections);
+
+  // Array.prototype.push.apply(parsedMetadata.sections, tempParsedMetadata.sections);
+  parsedMetadata.libraryMeta = tempParsedMetadata.libraryMeta;
 
   for (let section of parsedMetadata.sections) {
     section.libraryId = libraryId;
@@ -491,6 +529,8 @@ function parseLayerName(name, isValidSectionIdFn) {
 
   if(!name.includes("@")) {
     name = getSymbolNameWithSectionFn(name);
+  } else {
+    log(name);
   }
 
   let unspecialParts = name
@@ -531,7 +571,7 @@ function getStickersMetadata(stickersMetaData) {
   var sectionPrefix = '!StickerSection ';
   var title = 'title: ';
   var hideNames = 'hideNames: false';
-  var description = 'description: All of your symbols show up here. You can define your own groupings. Follow below link to see how to define new sections. <br/><br/> <a class="sticker-root-section__link" href="https://github.com/pratikjshah/symbol-browser/wiki/Getting-started-with-Symbols-Browser#32-define-categories" style="text-alignn:center;">How to create custom groups for Symbols?</a>';
+  var description = 'description: All of your symbols show up here. Symbol Browser will arrange all of your symbols in a groups based on the names. <br/><br/><br/><b>Want to define your own groupings?</b><br/> Follow below link to see how to define new sections. <br/><br/> <a class="sticker-root-section__link" href="https://github.com/pratikjshah/symbol-browser/wiki/Create-custom-sections-for-Symbols" style="text-alignn:center;">View Documentation</a>';
   var backgroundEach = "backgroundEach: '#ffffff'";
   var layout = 'layout: row';
   var yamlStickersMetadata = '';

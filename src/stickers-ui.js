@@ -99,7 +99,7 @@ export class StickersUI {
       frame: UI_MODE == 'modal',
       modal: UI_MODE == 'modal',
       hasShadow: UI_MODE == 'modal',
-      title: 'Symbol Browser [BETA]',
+      title: 'Symbol Browser',
       acceptsFirstMouse: true,
     });
 

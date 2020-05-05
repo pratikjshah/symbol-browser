@@ -267,7 +267,11 @@ var userConfig;
 var pluginRoot;
 var hasResponseCame = false;
 
-var timeout = __webpack_require__(/*! @skpm/timers */ "./node_modules/@skpm/timers/index.js"); // ===== Menu action handlers ========================
+var timeout = __webpack_require__(/*! @skpm/timers */ "./node_modules/@skpm/timers/index.js");
+
+var UI = __webpack_require__(/*! sketch/ui */ "sketch/ui");
+
+var Settings = __webpack_require__(/*! sketch/settings */ "sketch/settings"); // ===== Menu action handlers ========================
 
 
 function onAction(context) {// console.log("Action: " + context.action);
@@ -289,8 +293,9 @@ function openDocumentation(context) {
   openUrlInBrowser("http://symbol-browser.pratikshah.website/#faq");
 }
 function openSampleFile(context) {
-  init(context);
-  openUrlInBrowser("https://sketch.cloud/s/DVnWq");
+  init(context); // openUrlInBrowser("https://sketch.cloud/s/DVnWq");
+
+  openUrlInBrowser("https://www.sketch.com/s/f577ec9e-127a-4c5a-bd26-22ba9ddb64f5");
 }
 function reportIssue(context) {
   init(context);
@@ -319,12 +324,18 @@ function manageUpdate(remoteManifest, isDailyCheck) {
   if (remoteManifest.version) {
     if (localVersion === remoteManifest.version) {
       if (!isDailyCheck) {
-        globalContext.document.showMessage("🤘Yo🤘! You are using the latest version of " + remoteManifest.name); // console.log("🤘Yo🤘! You are using the latest version of " + remoteManifest.name);
+        // globalContext.document.showMessage("🤘Yo🤘! You are using the latest version of " + remoteManifest.name);
+        UI.message("🤘Yo🤘! You are using the latest version of " + remoteManifest.name);
+        Settings.setSettingForKey('hasUpdates', false); // console.log("🤘Yo🤘! You are using the latest version of " + remoteManifest.name);
+        // localStorage.setItem("hasUpdates", false);
       }
 
       setUpdateCheckDayOnTomorrow();
     } else {
-      globalContext.document.showMessage("Hey👋! New version of " + remoteManifest.name + " is available!"); // console.log("Hey👋! New version of " + remoteManifest.name + " is available!");
+      // globalContext.document.showMessage("Hey👋! New version of " + remoteManifest.name + " is available!");
+      UI.message("Hey👋! New version of " + remoteManifest.name + " is available!");
+      Settings.setSettingForKey('hasUpdates', true); // localStorage.setItem("hasUpdates", true);
+      // console.log("Hey👋! New version of " + remoteManifest.name + " is available!");
       //showAvailableUpdateDialog();
 
       setUpdateCheckDayOnTomorrow();
@@ -524,6 +535,28 @@ function trackEvent(action, label, value) {
 /***/ (function(module, exports) {
 
 module.exports = require("sketch");
+
+/***/ }),
+
+/***/ "sketch/settings":
+/*!**********************************!*\
+  !*** external "sketch/settings" ***!
+  \**********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("sketch/settings");
+
+/***/ }),
+
+/***/ "sketch/ui":
+/*!****************************!*\
+  !*** external "sketch/ui" ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("sketch/ui");
 
 /***/ })
 

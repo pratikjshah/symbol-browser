@@ -46,9 +46,9 @@
       "script": "handler.js",
       "handler": "openDocumentation",
       "shortcut": "",
-      "name": "Getting started with Stickers",
+      "name": "Create custom Symbol groups",
       "identifier": "openDocumentation",
-      "description": "View Symtax guide for adding Stickers",
+      "description": "View Symtax guide for adding Custom sections",
       "icon": "icon-menu.png"
     },
     {

@@ -54,20 +54,28 @@ class StickersPage {
     StickersClient.once('loaded', rawStickerIndex => {
       this.vue.stickerIndex = this.processRawStickerIndex(rawStickerIndex);
       this.vue.$nextTick(() => {
-        $('.header-area__search-field').focus();
+        // $('.header-area__search-field').focus();
         if($('*[data-key="'+localStorage.getItem('activeLibrary')+'"]') == null) {
           $('*[data-key="all"]').click();
         } else {
           $('*[data-key="'+localStorage.getItem('activeLibrary')+'"]').click();
         }
         this.loadVisibleStickers();
+        if(localStorage.getItem('hasUpdates') !== null && localStorage.getItem('hasUpdates') == true) {
+          $(document.body).addClass('hasUpdates');
+        }
       });
     });
   }
 
   processRawStickerIndex(stickerIndex) {
+
     stickerIndex.libraries = stickerIndex.libraries
         .filter(lib => !!lib.sections.length);
+
+    if(stickerIndex.libraries.length <= 1) {
+      $(document.body).addClass('hide-navigation');
+    }
 
     for (let library of stickerIndex.libraries) {
       for (let section of library.sections) {
@@ -221,9 +229,9 @@ class StickersPage {
     this.vue.$nextTick(() => {
       const re = this.regexForSearchText(query);
 
-      if(query.length < 1) {
-        console.log("Clear search and go back to selected tab");
-      }
+      // if(query.length < 1) {
+      //   console.log("Clear search and go back to selected tab");
+      // }
 
 
       const findIn = s => this.vueGlobal.searchText ? (s || '').search(re) >= 0 : true;
@@ -267,10 +275,10 @@ class StickersPage {
       let activeLibrary = localStorage.getItem('activeLibrary');
       localStorage.setItem("beforeSearchActiveLibrary", activeLibrary);
 
-      console.log("selectedLibraries");
-      console.log(selectedLibraries);
-      console.log("activeLibrary");
-      console.log(activeLibrary);
+      // console.log("selectedLibraries");
+      // console.log(selectedLibraries);
+      // console.log("activeLibrary");
+      // console.log(activeLibrary);
 
       if (activeLibrary !== 'all') {
         searchableLibraries = selectedLibraries.filter(obj => {

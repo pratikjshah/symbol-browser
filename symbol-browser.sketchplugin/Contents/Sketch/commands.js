@@ -25784,7 +25784,11 @@ var userConfig;
 var pluginRoot;
 var hasResponseCame = false;
 
-var timeout = __webpack_require__(/*! @skpm/timers */ "./node_modules/@skpm/timers/index.js"); // ===== Menu action handlers ========================
+var timeout = __webpack_require__(/*! @skpm/timers */ "./node_modules/@skpm/timers/index.js");
+
+var UI = __webpack_require__(/*! sketch/ui */ "sketch/ui");
+
+var Settings = __webpack_require__(/*! sketch/settings */ "sketch/settings"); // ===== Menu action handlers ========================
 
 
 function onAction(context) {// console.log("Action: " + context.action);
@@ -25806,8 +25810,9 @@ function openDocumentation(context) {
   openUrlInBrowser("http://symbol-browser.pratikshah.website/#faq");
 }
 function openSampleFile(context) {
-  init(context);
-  openUrlInBrowser("https://sketch.cloud/s/DVnWq");
+  init(context); // openUrlInBrowser("https://sketch.cloud/s/DVnWq");
+
+  openUrlInBrowser("https://www.sketch.com/s/f577ec9e-127a-4c5a-bd26-22ba9ddb64f5");
 }
 function reportIssue(context) {
   init(context);
@@ -25836,12 +25841,18 @@ function manageUpdate(remoteManifest, isDailyCheck) {
   if (remoteManifest.version) {
     if (localVersion === remoteManifest.version) {
       if (!isDailyCheck) {
-        globalContext.document.showMessage("🤘Yo🤘! You are using the latest version of " + remoteManifest.name); // console.log("🤘Yo🤘! You are using the latest version of " + remoteManifest.name);
+        // globalContext.document.showMessage("🤘Yo🤘! You are using the latest version of " + remoteManifest.name);
+        UI.message("🤘Yo🤘! You are using the latest version of " + remoteManifest.name);
+        Settings.setSettingForKey('hasUpdates', false); // console.log("🤘Yo🤘! You are using the latest version of " + remoteManifest.name);
+        // localStorage.setItem("hasUpdates", false);
       }
 
       setUpdateCheckDayOnTomorrow();
     } else {
-      globalContext.document.showMessage("Hey👋! New version of " + remoteManifest.name + " is available!"); // console.log("Hey👋! New version of " + remoteManifest.name + " is available!");
+      // globalContext.document.showMessage("Hey👋! New version of " + remoteManifest.name + " is available!");
+      UI.message("Hey👋! New version of " + remoteManifest.name + " is available!");
+      Settings.setSettingForKey('hasUpdates', true); // localStorage.setItem("hasUpdates", true);
+      // console.log("Hey👋! New version of " + remoteManifest.name + " is available!");
       //showAvailableUpdateDialog();
 
       setUpdateCheckDayOnTomorrow();
@@ -26094,7 +26105,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
 
-var INDEX_FORMAT_VERSION = 5;
+var INDEX_FORMAT_VERSION = 6;
 var FORCE_REBULD = false;
 var SHOW_DEFAULT_STICKERS = true;
 var _defaultSection = 'DefaultSymbols';
@@ -26295,7 +26306,7 @@ function _buildStickerIndexForLibrary() {
   _buildStickerIndexForLibrary = _asyncToGenerator(
   /*#__PURE__*/
   regeneratorRuntime.mark(function _callee3(libraryId, defaultLibName, document, progressReporter) {
-    var libraryIndex, cachePath, sectionsById, allSymbolInstances, parsedMetadata, allSymbolMasters, symbolStickersMetaData, metaData, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, symbolLayer, symbolInstance, init, last, layerName, allTextLayers, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, textLayer, text, tempParsedMetadata, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, section, _i2, _Array$from, _section, parentId, parentSection, possibleStickers, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, layer, parsedName, nonEmptyItems;
+    var libraryIndex, cachePath, sectionsById, allSymbolInstances, parsedMetadata, allSymbolMasters, symbolStickersMetaData, metaData, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, symbolLayer, symbolInstance, init, last, layerName, allTextLayers, combinedText, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, textLayer, text, tempParsedMetadata, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, section, _i2, _Array$from, _section, parentId, parentSection, possibleStickers, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, layer, parsedName, nonEmptyItems;
 
     return regeneratorRuntime.wrap(function _callee3$(_context3) {
       while (1) {
@@ -26329,25 +26340,38 @@ function _buildStickerIndexForLibrary() {
               symbolLayer = _step3.value;
               // var symbolInstance = symbolLayer.newSymbolInstance();
               symbolInstance = symbolLayer;
-              layerName = symbolInstance.name() + "";
+              layerName = symbolInstance.name() + ""; // if(layerName.indexOf("@") < 0) {
+              //   layerName = layerName.replace(/[^a-zA-Z0-9 \/_]/g, '');
+              //   if(layerName.lastIndexOf("/") > 0) {
+              //     init = (layerName.substring(0, layerName.lastIndexOf("/") + 0)).replace(/\s\s+/g, ' ').replace(/\//g,'_').replace(/\s/g,'');
+              //     last = layerName.substring(layerName.lastIndexOf("/") + 1, layerName.length);
+              //   } else {
+              //     init = layerName.replace(/\s/g,'');
+              //     last = layerName;
+              //   }
+              //   metaData = {};
+              //   metaData.name = "@" + _defaultSection + "." + init;
+              //   // symbolInstance.name = layerName + " " + "@" + _defaultSection + "." + init;
+              //   symbolStickersMetaData.push(metaData);
+              //   allSymbolInstances.push(symbolInstance);
+              //   // symbolInstance.name = layerName;
+              // }
 
-              if (layerName.indexOf("@") < 0) {
-                layerName = layerName.replace(/[^a-zA-Z0-9 \/_]/g, '');
+              layerName = layerName.replace(/[^a-zA-Z0-9 \/_]/g, '');
 
-                if (layerName.lastIndexOf("/") > 0) {
-                  init = layerName.substring(0, layerName.lastIndexOf("/") + 0).replace(/\s\s+/g, ' ').replace(/\//g, '_').replace(/\s/g, '');
-                  last = layerName.substring(layerName.lastIndexOf("/") + 1, layerName.length);
-                } else {
-                  init = layerName.replace(/\s/g, '');
-                  last = layerName;
-                }
-
-                metaData = {};
-                metaData.name = "@" + _defaultSection + "." + init; // symbolInstance.name = layerName + " " + "@" + _defaultSection + "." + init;
-
-                symbolStickersMetaData.push(metaData);
-                allSymbolInstances.push(symbolInstance); // symbolInstance.name = layerName;
+              if (layerName.lastIndexOf("/") > 0) {
+                init = layerName.substring(0, layerName.lastIndexOf("/") + 0).replace(/\s\s+/g, ' ').replace(/\//g, '_').replace(/\s/g, '');
+                last = layerName.substring(layerName.lastIndexOf("/") + 1, layerName.length);
+              } else {
+                init = layerName.replace(/\s/g, '');
+                last = layerName;
               }
+
+              metaData = {};
+              metaData.name = "@" + _defaultSection + "." + init; // symbolInstance.name = layerName + " " + "@" + _defaultSection + "." + init;
+
+              symbolStickersMetaData.push(metaData);
+              allSymbolInstances.push(symbolInstance); // symbolInstance.name = layerName;
             } // log('symbolStickersMetaData');
             // log(symbolStickersMetaData);
             // log('getStickersMetadata(symbolStickersMetaData)');
@@ -26396,13 +26420,15 @@ function _buildStickerIndexForLibrary() {
             allTextLayers = _util__WEBPACK_IMPORTED_MODULE_4__["getAllLayersMatchingPredicate"](document, NSPredicate.predicateWithFormat('className == %@', 'MSTextLayer'));
             allTextLayers.reverse(); // layer list order, not stacking order
 
+            log("allTextLayers: " + allTextLayers.length);
+            combinedText = "";
             _iteratorNormalCompletion4 = true;
             _didIteratorError4 = false;
             _iteratorError4 = undefined;
-            _context3.prev = 36;
+            _context3.prev = 38;
             _iterator4 = allTextLayers[Symbol.iterator]();
 
-          case 38:
+          case 40:
             if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
               _context3.next = 49;
               break;
@@ -26412,35 +26438,34 @@ function _buildStickerIndexForLibrary() {
             text = textLayer.stringValue();
 
             if (!(text.indexOf('!Sticker') < 0)) {
-              _context3.next = 43;
+              _context3.next = 45;
               break;
             }
 
             return _context3.abrupt("continue", 46);
 
-          case 43:
-            tempParsedMetadata = parseStickerMetadata(text); // log('symbolStickersMetaData');
+          case 45:
+            combinedText = combinedText + " \r\n\r\n\r\n" + text; // let tempParsedMetadata = parseStickerMetadata(text);
+            // // log('symbolStickersMetaData');
+            // // log(parsedMetadata.sections.length);
+            // // log(parsedMetadata.sections);
+            // // log('otherStickersMetaData');
+            // // log(tempParsedMetadata.sections.length);
+            // // log(tempParsedMetadata.sections);
+            // if(SHOW_DEFAULT_STICKERS) {
+            //   Array.prototype.push.apply(parsedMetadata.sections, tempParsedMetadata.sections);
+            // } else {
+            //   parsedMetadata.sections = tempParsedMetadata.sections;
+            // }
+            // log('parsedMetadata.sections');
             // log(parsedMetadata.sections.length);
             // log(parsedMetadata.sections);
-            // log('otherStickersMetaData');
-            // log(tempParsedMetadata.sections.length);
-            // log(tempParsedMetadata.sections);
-
-            if (SHOW_DEFAULT_STICKERS) {
-              Array.prototype.push.apply(parsedMetadata.sections, tempParsedMetadata.sections);
-            } else {
-              parsedMetadata.sections = tempParsedMetadata.sections;
-            } // log('parsedMetadata.sections');
-            // log(parsedMetadata.sections.length);
-            // log(parsedMetadata.sections);
-            // Array.prototype.push.apply(parsedMetadata.sections, tempParsedMetadata.sections);
-
-
-            parsedMetadata.libraryMeta = tempParsedMetadata.libraryMeta;
+            // // Array.prototype.push.apply(parsedMetadata.sections, tempParsedMetadata.sections);
+            // parsedMetadata.libraryMeta = tempParsedMetadata.libraryMeta;
 
           case 46:
             _iteratorNormalCompletion4 = true;
-            _context3.next = 38;
+            _context3.next = 40;
             break;
 
           case 49:
@@ -26449,7 +26474,7 @@ function _buildStickerIndexForLibrary() {
 
           case 51:
             _context3.prev = 51;
-            _context3.t1 = _context3["catch"](36);
+            _context3.t1 = _context3["catch"](38);
             _didIteratorError4 = true;
             _iteratorError4 = _context3.t1;
 
@@ -26478,10 +26503,25 @@ function _buildStickerIndexForLibrary() {
             return _context3.finish(55);
 
           case 63:
+            // log("combinedText");
+            // log(combinedText);
+            tempParsedMetadata = parseStickerMetadata(combinedText);
+
+            if (SHOW_DEFAULT_STICKERS) {
+              Array.prototype.push.apply(parsedMetadata.sections, tempParsedMetadata.sections);
+            } else {
+              parsedMetadata.sections = tempParsedMetadata.sections;
+            } // log('parsedMetadata.sections');
+            // log(parsedMetadata.sections.length);
+            // log(parsedMetadata.sections);
+            // Array.prototype.push.apply(parsedMetadata.sections, tempParsedMetadata.sections);
+
+
+            parsedMetadata.libraryMeta = tempParsedMetadata.libraryMeta;
             _iteratorNormalCompletion5 = true;
             _didIteratorError5 = false;
             _iteratorError5 = undefined;
-            _context3.prev = 66;
+            _context3.prev = 69;
 
             for (_iterator5 = parsedMetadata.sections[Symbol.iterator](); !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
               section = _step5.value;
@@ -26494,40 +26534,40 @@ function _buildStickerIndexForLibrary() {
               }
             }
 
-            _context3.next = 74;
+            _context3.next = 77;
             break;
 
-          case 70:
-            _context3.prev = 70;
-            _context3.t2 = _context3["catch"](66);
+          case 73:
+            _context3.prev = 73;
+            _context3.t2 = _context3["catch"](69);
             _didIteratorError5 = true;
             _iteratorError5 = _context3.t2;
 
-          case 74:
-            _context3.prev = 74;
-            _context3.prev = 75;
+          case 77:
+            _context3.prev = 77;
+            _context3.prev = 78;
 
             if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
               _iterator5.return();
             }
 
-          case 77:
-            _context3.prev = 77;
+          case 80:
+            _context3.prev = 80;
 
             if (!_didIteratorError5) {
-              _context3.next = 80;
+              _context3.next = 83;
               break;
             }
 
             throw _iteratorError5;
 
-          case 80:
+          case 83:
+            return _context3.finish(80);
+
+          case 84:
             return _context3.finish(77);
 
-          case 81:
-            return _context3.finish(74);
-
-          case 82:
+          case 85:
             if (parsedMetadata.libraryMeta.title) {
               libraryIndex.title = parsedMetadata.libraryMeta.title;
             }
@@ -26539,9 +26579,9 @@ function _buildStickerIndexForLibrary() {
 
             _i2 = 0, _Array$from = Array.from(libraryIndex.sections);
 
-          case 85:
+          case 88:
             if (!(_i2 < _Array$from.length)) {
-              _context3.next = 99;
+              _context3.next = 102;
               break;
             }
 
@@ -26549,32 +26589,32 @@ function _buildStickerIndexForLibrary() {
             parentId = _section.id.substr(0, _section.id.lastIndexOf('.'));
 
             if (!parentId) {
-              _context3.next = 96;
+              _context3.next = 99;
               break;
             }
 
             parentSection = sectionsById[parentId];
 
             if (parentSection) {
-              _context3.next = 93;
+              _context3.next = 96;
               break;
             }
 
             log("Unknown parent section ".concat(parentId));
-            return _context3.abrupt("continue", 96);
+            return _context3.abrupt("continue", 99);
 
-          case 93:
+          case 96:
             parentSection.items = parentSection.items || [];
             parentSection.items.push(_section); // remove from the root
 
             libraryIndex.sections.splice(libraryIndex.sections.indexOf(_section), 1);
 
-          case 96:
+          case 99:
             _i2++;
-            _context3.next = 85;
+            _context3.next = 88;
             break;
 
-          case 99:
+          case 102:
             libraryIndex.sections.push(libraryIndex.sections.shift()); // go through all layers tagged to a section
 
             possibleStickers = _util__WEBPACK_IMPORTED_MODULE_4__["getAllLayersMatchingPredicate"](document, NSPredicate.predicateWithFormat('name matches ".*@.*"'));
@@ -26588,12 +26628,12 @@ function _buildStickerIndexForLibrary() {
             _iteratorNormalCompletion6 = true;
             _didIteratorError6 = false;
             _iteratorError6 = undefined;
-            _context3.prev = 107;
+            _context3.prev = 110;
             _iterator6 = possibleStickers[Symbol.iterator]();
 
-          case 109:
+          case 112:
             if (_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done) {
-              _context3.next = 121;
+              _context3.next = 124;
               break;
             }
 
@@ -26601,13 +26641,13 @@ function _buildStickerIndexForLibrary() {
             progressReporter.increment();
 
             if (!(layer instanceof MSTextLayer && String(layer.name()).startsWith('!Sticker'))) {
-              _context3.next = 114;
+              _context3.next = 117;
               break;
             }
 
-            return _context3.abrupt("continue", 118);
+            return _context3.abrupt("continue", 121);
 
-          case 114:
+          case 117:
             // let parsedName;
             // if(layer instanceof MSSymbolMaster && !String(layer.name()).startsWith('@')) {
             //   parsedName = parseLayerName(layer.name(), sectionId => sectionId in sectionsById, true);
@@ -26625,7 +26665,7 @@ function _buildStickerIndexForLibrary() {
             }
 
             if (!(parsedName.isSticker || layer instanceof MSSymbolMaster)) {
-              _context3.next = 118;
+              _context3.next = 121;
               break;
             }
 
@@ -26729,48 +26769,48 @@ function _buildStickerIndexForLibrary() {
                   }
                 }
               }, _callee2, null, [[15, 19, 23, 31], [24,, 26, 30]]);
-            })(), "t3", 118);
-
-          case 118:
-            _iteratorNormalCompletion6 = true;
-            _context3.next = 109;
-            break;
+            })(), "t3", 121);
 
           case 121:
-            _context3.next = 127;
+            _iteratorNormalCompletion6 = true;
+            _context3.next = 112;
             break;
 
-          case 123:
-            _context3.prev = 123;
-            _context3.t4 = _context3["catch"](107);
+          case 124:
+            _context3.next = 130;
+            break;
+
+          case 126:
+            _context3.prev = 126;
+            _context3.t4 = _context3["catch"](110);
             _didIteratorError6 = true;
             _iteratorError6 = _context3.t4;
 
-          case 127:
-            _context3.prev = 127;
-            _context3.prev = 128;
+          case 130:
+            _context3.prev = 130;
+            _context3.prev = 131;
 
             if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
               _iterator6.return();
             }
 
-          case 130:
-            _context3.prev = 130;
+          case 133:
+            _context3.prev = 133;
 
             if (!_didIteratorError6) {
-              _context3.next = 133;
+              _context3.next = 136;
               break;
             }
 
             throw _iteratorError6;
 
-          case 133:
+          case 136:
+            return _context3.finish(133);
+
+          case 137:
             return _context3.finish(130);
 
-          case 134:
-            return _context3.finish(127);
-
-          case 135:
+          case 138:
             // cull any sections that don't indirectly or directly contain stickers
             nonEmptyItems = function nonEmptyItems(items) {
               return items.filter(function (item) {
@@ -26787,12 +26827,12 @@ function _buildStickerIndexForLibrary() {
             libraryIndex.title = libraryIndex.title || defaultLibName || _util__WEBPACK_IMPORTED_MODULE_4__["getDocumentName"](document);
             return _context3.abrupt("return", libraryIndex);
 
-          case 139:
+          case 142:
           case "end":
             return _context3.stop();
         }
       }
-    }, _callee3, null, [[14, 18, 22, 30], [23,, 25, 29], [36, 51, 55, 63], [56,, 58, 62], [66, 70, 74, 82], [75,, 77, 81], [107, 123, 127, 135], [128,, 130, 134]]);
+    }, _callee3, null, [[14, 18, 22, 30], [23,, 25, 29], [38, 51, 55, 63], [56,, 58, 62], [69, 73, 77, 85], [78,, 80, 84], [110, 126, 130, 138], [131,, 133, 137]]);
   }));
   return _buildStickerIndexForLibrary.apply(this, arguments);
 }
@@ -26941,6 +26981,8 @@ function parseLayerName(name, isValidSectionIdFn) {
 
   if (!name.includes("@")) {
     name = getSymbolNameWithSectionFn(name);
+  } else {
+    log(name);
   }
 
   var unspecialParts = name.split(/(@+[\w\.]+)/).filter(function (part) {
@@ -26976,7 +27018,7 @@ function getStickersMetadata(stickersMetaData) {
   var sectionPrefix = '!StickerSection ';
   var title = 'title: ';
   var hideNames = 'hideNames: false';
-  var description = 'description: All of your symbols show up here. You can define your own groupings. Follow below link to see how to define new sections. <br/><br/> <a class="sticker-root-section__link" href="https://github.com/pratikjshah/symbol-browser/wiki/Getting-started-with-Symbols-Browser#32-define-categories" style="text-alignn:center;">How to create custom groups for Symbols?</a>';
+  var description = 'description: All of your symbols show up here. Symbol Browser will arrange all of your symbols in a groups based on the names. <br/><br/><br/><b>Want to define your own groupings?</b><br/> Follow below link to see how to define new sections. <br/><br/> <a class="sticker-root-section__link" href="https://github.com/pratikjshah/symbol-browser/wiki/Create-custom-sections-for-Symbols" style="text-alignn:center;">View Documentation</a>';
   var backgroundEach = "backgroundEach: '#ffffff'";
   var layout = 'layout: row';
   var yamlStickersMetadata = '';
@@ -27177,7 +27219,7 @@ function () {
         frame: UI_MODE == 'modal',
         modal: UI_MODE == 'modal',
         hasShadow: UI_MODE == 'modal',
-        title: 'Symbol Browser [BETA]',
+        title: 'Symbol Browser',
         acceptsFirstMouse: true
       });
       this.webContents = this.browserWindow.webContents;
@@ -28066,6 +28108,28 @@ module.exports = require("buffer");
 /***/ (function(module, exports) {
 
 module.exports = require("sketch");
+
+/***/ }),
+
+/***/ "sketch/settings":
+/*!**********************************!*\
+  !*** external "sketch/settings" ***!
+  \**********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("sketch/settings");
+
+/***/ }),
+
+/***/ "sketch/ui":
+/*!****************************!*\
+  !*** external "sketch/ui" ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("sketch/ui");
 
 /***/ }),
 
