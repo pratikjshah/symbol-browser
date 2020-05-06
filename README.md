@@ -1,3 +1,4 @@
+
 # Sketch Symbol Browser
 
 <img src="https://raw.githubusercontent.com/pratikjshah/symbol-browser/master/art/symbol-browser-logo.png" alt="Sketch Symbol Browser" width="160" align="right" />
@@ -29,12 +30,16 @@ Visit plugin website for more: <a href="http://symbol-browser.pratikshah.website
 
 <br/>
 
-## Important links:
-* [Download Plugin](https://github.com/pratikjshah/symbol-browser/releases/latest/download/symbol-browser.sketchplugin.zip)
-* [Help and FAQs](https://github.com/pratikjshah/symbol-browser/#faq)
-* [Create custom Symbol groups](https://github.com/pratikjshah/symbol-browser/wiki/Create-custom-sections-for-Symbols)
-* [How to create and share Stickers](https://github.com/pratikjshah/symbol-browser/wiki/Getting-started-with-Symbols-Browser#steps-to-get-started)
+#### Important links:
+* 🚀 [Release Notes](http://symbol-browser.pratikshah.website/#features)
+* 👨‍🔬 [Example Sketch library](https://www.sketch.com/s/f577ec9e-127a-4c5a-bd26-22ba9ddb64f5)
 
+
+#### Wiki Pages:
+* [Getting started with Symbols Browser](https://github.com/pratikjshah/symbol-browser/wiki/Getting-started-with-Symbols-Browser)
+* [Create custom sections for Symbols](https://github.com/pratikjshah/symbol-browser/wiki/Create-custom-sections-for-Symbols)
+* [Understanding Metadata syntax](https://github.com/pratikjshah/symbol-browser/wiki/Understanding-Metadata-syntax)
+* [Sample Metadata code](https://github.com/pratikjshah/symbol-browser/wiki/Understanding-Metadata-syntax)
 
 <br/>
 
