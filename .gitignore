@@ -7,8 +7,12 @@ node_modules
 .npm
 npm-debug.log
 
+
 # mac
 .DS_Store
 
 # WebStorm
 .idea
+_
+_/test/wm-gdp-library.sketch
+_/backups/Avatar Library by Drawer.sketch

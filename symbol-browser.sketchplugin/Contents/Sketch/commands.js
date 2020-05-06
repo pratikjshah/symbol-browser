@@ -25486,233 +25486,6 @@ module.exports = EventEmitter
 
 /***/ }),
 
-/***/ "./node_modules/sketch-polyfill-fetch/lib/index.js":
-/*!*********************************************************!*\
-  !*** ./node_modules/sketch-polyfill-fetch/lib/index.js ***!
-  \*********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(Promise) {/* globals NSJSONSerialization NSJSONWritingPrettyPrinted NSDictionary NSHTTPURLResponse NSString NSASCIIStringEncoding NSUTF8StringEncoding coscript NSURL NSMutableURLRequest NSMutableData NSURLConnection */
-var _ObjCClass = __webpack_require__(/*! cocoascript-class */ "./node_modules/cocoascript-class/lib/index.js")
-
-var ObjCClass = _ObjCClass.default
-var Buffer
-try {
-  Buffer = __webpack_require__(/*! buffer */ "buffer").Buffer
-} catch (err) {}
-
-function response (httpResponse, data) {
-  var keys = []
-  var all = []
-  var headers = {}
-  var header
-
-  for (var i = 0; i < httpResponse.allHeaderFields().allKeys().length; i++) {
-    var key = httpResponse.allHeaderFields().allKeys()[i].toLowerCase()
-    var value = String(httpResponse.allHeaderFields()[key])
-    keys.push(key)
-    all.push([key, value])
-    header = headers[key]
-    headers[key] = header ? (header + ',' + value) : value
-  }
-
-  return {
-    ok: (httpResponse.statusCode() / 200 | 0) == 1, // 200-399
-    status: Number(httpResponse.statusCode()),
-    statusText: NSHTTPURLResponse.localizedStringForStatusCode(httpResponse.statusCode()),
-    useFinalURL: true,
-    url: String(httpResponse.URL().absoluteString()),
-    clone: response.bind(this, httpResponse, data),
-    text: function () {
-      return new Promise(function (resolve, reject) {
-        const str = NSString.alloc().initWithData_encoding(data, NSASCIIStringEncoding)
-        if (str) {
-          resolve(str)
-        } else {
-          reject(new Error("Couldn't parse body"))
-        }
-      })
-    },
-    json: function () {
-      return new Promise(function (resolve, reject) {
-        var str = NSString.alloc().initWithData_encoding(data, NSUTF8StringEncoding)
-        if (str) {
-          // parse errors are turned into exceptions, which cause promise to be rejected
-          var obj = JSON.parse(str)
-          resolve(obj)
-        } else {
-          reject(new Error('Could not parse JSON because it is not valid UTF-8 data.'))
-        }
-      })
-    },
-    blob: function () {
-      return Promise.resolve(data)
-    },
-    arrayBuffer: function() {
-      return Promise.resolve(Buffer.from(data))
-    },
-    headers: {
-      keys: function () { return keys },
-      entries: function () { return all },
-      get: function (n) { return headers[n.toLowerCase()] },
-      has: function (n) { return n.toLowerCase() in headers }
-    }
-  }
-}
-
-// We create one ObjC class for ourselves here
-var DelegateClass
-
-function fetch (urlString, options) {
-  if (typeof urlString === 'object' && (!urlString.isKindOfClass || !urlString.isKindOfClass(NSString))) {
-    options = urlString
-    urlString = options.url
-  }
-  options = options || {}
-  if (!urlString) {
-    return Promise.reject('Missing URL')
-  }
-  var fiber
-  try {
-    fiber = coscript.createFiber()
-  } catch (err) {
-    coscript.shouldKeepAround = true
-  }
-  return new Promise(function (resolve, reject) {
-    var url = NSURL.alloc().initWithString(urlString)
-    var request = NSMutableURLRequest.requestWithURL(url)
-    request.setHTTPMethod(options.method || 'GET')
-
-    Object.keys(options.headers || {}).forEach(function (i) {
-      request.setValue_forHTTPHeaderField(options.headers[i], i)
-    })
-
-    if (options.body) {
-      var data
-      if (typeof options.body === 'string') {
-        var str = NSString.alloc().initWithString(options.body)
-        data = str.dataUsingEncoding(NSUTF8StringEncoding)
-      } else if (Buffer && Buffer.isBuffer(options.body)) {
-        data = options.body.toNSData()
-      } else if (options.body.isKindOfClass && (options.body.isKindOfClass(NSData) == 1) ) {
-        data = options.body
-      } else if (options.body._isFormData) {
-        var boundary = options.body._boundary
-        data = options.body._data
-        data.appendData(
-          NSString.alloc()
-            .initWithString("--" + boundary + "--\r\n")
-            .dataUsingEncoding(NSUTF8StringEncoding)
-        )
-        request.setValue_forHTTPHeaderField('multipart/form-data; boundary=' + boundary, 'Content-Type')
-      } else {
-        var error
-        data = NSJSONSerialization.dataWithJSONObject_options_error(options.body, NSJSONWritingPrettyPrinted, error)
-        if (error != null) {
-          return reject(error)
-        }
-        request.setValue_forHTTPHeaderField('' + data.length(), 'Content-Length')
-      }
-      request.setHTTPBody(data)
-    }
-
-    if (options.cache) {
-      switch (options.cache) {
-        case 'reload':
-        case 'no-cache':
-        case 'no-store': {
-          request.setCachePolicy(1) // NSURLRequestReloadIgnoringLocalCacheData
-        }
-        case 'force-cache': {
-          request.setCachePolicy(2) // NSURLRequestReturnCacheDataElseLoad
-        }
-        case 'only-if-cached': {
-          request.setCachePolicy(3) // NSURLRequestReturnCacheDataElseLoad
-        }
-      }
-    }
-
-
-    if (!options.credentials) {
-      request.setHTTPShouldHandleCookies(false)
-    }
-
-    if (!DelegateClass) {
-      DelegateClass = ObjCClass({
-        classname: 'FetchPolyfillDelegate',
-        data: null,
-        httpResponse: null,
-        fiber: null,
-        callbacks: null,
-
-        'connectionDidFinishLoading:': function (connection) {
-          this.callbacks.succeed(this.httpResponse, this.data)
-          if (this.fiber) {
-            this.fiber.cleanup()
-          } else {
-            coscript.shouldKeepAround = false
-          }
-        },
-        'connection:didReceiveResponse:': function (connection, httpResponse) {
-          this.httpResponse = httpResponse
-          this.data = NSMutableData.alloc().init()
-        },
-        'connection:didFailWithError:': function (connection, error) {
-          this.callbacks.fail(error)
-          if (this.fiber) {
-            this.fiber.cleanup()
-          } else {
-            coscript.shouldKeepAround = false
-          }
-        },
-        'connection:didReceiveData:': function (connection, data) {
-          this.data.appendData(data)
-        }
-      })
-    }
-
-    var finished = false
-
-    function succeed(res, data) {
-      finished = true
-      resolve(response(res, data))
-    }
-
-    function fail(err) {
-      finished = true
-      reject(err)
-    }
-
-    var connectionDelegate = DelegateClass.new()
-    connectionDelegate.callbacks = NSDictionary.dictionaryWithDictionary({
-      succeed: succeed,
-      fail: fail,
-    })
-    connectionDelegate.fiber = fiber;
-
-    var connection = NSURLConnection.alloc().initWithRequest_delegate(
-      request,
-      connectionDelegate
-    )
-
-    if (fiber) {
-      fiber.onCleanup(function () {
-        if (!finished) {
-          connection.cancel()
-        }
-      })
-    }
-
-  })
-}
-
-module.exports = fetch
-
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/promise-polyfill/lib/index.js */ "./node_modules/promise-polyfill/lib/index.js")))
-
-/***/ }),
-
 /***/ "./node_modules/timers-browserify/main.js":
 /*!************************************************!*\
   !*** ./node_modules/timers-browserify/main.js ***!
@@ -25945,13 +25718,13 @@ if (!global._babelPolyfill) {
 
 
 function onShowStickers(context) {
-  // handler.init(context);
+  _handler__WEBPACK_IMPORTED_MODULE_2__["init"](context);
   var window = new _stickers_ui_js__WEBPACK_IMPORTED_MODULE_0__["StickersUI"](context);
   window.showHide();
   _handler__WEBPACK_IMPORTED_MODULE_2__["trackEvent"]("Stickers", "onShowHideStickers", 1);
 }
 function onClearCache(context) {
-  // handler.init(context);
+  _handler__WEBPACK_IMPORTED_MODULE_2__["init"](context);
   _util__WEBPACK_IMPORTED_MODULE_1__["rmdirRecursive"](_util__WEBPACK_IMPORTED_MODULE_1__["getPluginCachePath"]());
   context.document.showMessage("\u2705 Symbol index cleared");
   _handler__WEBPACK_IMPORTED_MODULE_2__["trackEvent"]("Stickers", "onClearCache", 1);
@@ -25969,7 +25742,7 @@ function onClearCache(context) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function(fetch) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "onAction", function() { return onAction; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "onAction", function() { return onAction; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "onOpenDocument", function() { return onOpenDocument; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "checkForUpdate", function() { return checkForUpdate; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "openDocumentation", function() { return openDocumentation; });
@@ -26005,18 +25778,23 @@ __webpack_require__.r(__webpack_exports__);
  */
 
 var globalContext;
-var remoteManifestUrl = "https://raw.githubusercontent.com/pratikjshah/symbol-browser/master/symbol-browser.sketchplugin/Contents/Resources/user.config";
+var remoteManifestUrl = "https://raw.githubusercontent.com/pratikjshah/symbol-browser/master/symbol-browser.sketchplugin/Contents/Sketch/manifest.json";
 var localDataPath;
 var userConfig;
 var pluginRoot;
 var hasResponseCame = false;
 
-var timeout = __webpack_require__(/*! @skpm/timers */ "./node_modules/@skpm/timers/index.js"); // ===== Menu action handlers ========================
+var timeout = __webpack_require__(/*! @skpm/timers */ "./node_modules/@skpm/timers/index.js");
+
+var UI = __webpack_require__(/*! sketch/ui */ "sketch/ui");
+
+var Settings = __webpack_require__(/*! sketch/settings */ "sketch/settings"); // ===== Menu action handlers ========================
 
 
 function onAction(context) {// console.log("Action: " + context.action);
 }
 function onOpenDocument(context) {
+  globalContext = context;
   init(context);
   networkRequest(remoteManifestUrl, manageDailyUpdateCheck);
   trackEvent("onAction", "onOpenDocument", 1);
@@ -26032,8 +25810,9 @@ function openDocumentation(context) {
   openUrlInBrowser("http://symbol-browser.pratikshah.website/#faq");
 }
 function openSampleFile(context) {
-  init(context);
-  openUrlInBrowser("https://sketch.cloud/s/DVnWq");
+  init(context); // openUrlInBrowser("https://sketch.cloud/s/DVnWq");
+
+  openUrlInBrowser("https://www.sketch.com/s/f577ec9e-127a-4c5a-bd26-22ba9ddb64f5");
 }
 function reportIssue(context) {
   init(context);
@@ -26057,20 +25836,29 @@ function manageUpdate(remoteManifest, isDailyCheck) {
   /*if (userConfig.localVersion != remoteManifest.version) {
   	showMsg(userConfig.name + ": "+ userConfig.localVersion + " is out of date! Please check for updates.");
   }*/
-  if (remoteManifest.localVersion) {
-    if (userConfig.localVersion === remoteManifest.localVersion) {
+  var localVersion = globalContext.plugin.version();
+
+  if (remoteManifest.version) {
+    if (localVersion === remoteManifest.version) {
       if (!isDailyCheck) {
-        showMsg("🤘Yo🤘! You are using the latest version of " + userConfig.name);
+        // globalContext.document.showMessage("🤘Yo🤘! You are using the latest version of " + remoteManifest.name);
+        UI.message("🤘Yo🤘! You are using the latest version of " + remoteManifest.name);
+        Settings.setSettingForKey('hasUpdates', false); // console.log("🤘Yo🤘! You are using the latest version of " + remoteManifest.name);
+        // localStorage.setItem("hasUpdates", false);
       }
 
       setUpdateCheckDayOnTomorrow();
     } else {
-      showMsg("Hey👋! New version of " + userConfig.name + " is available!"); //showAvailableUpdateDialog();
+      // globalContext.document.showMessage("Hey👋! New version of " + remoteManifest.name + " is available!");
+      UI.message("Hey👋! New version of " + remoteManifest.name + " is available!");
+      Settings.setSettingForKey('hasUpdates', true); // localStorage.setItem("hasUpdates", true);
+      // console.log("Hey👋! New version of " + remoteManifest.name + " is available!");
+      //showAvailableUpdateDialog();
 
       setUpdateCheckDayOnTomorrow();
     }
   } else {
-    //showMsg("can not check:");
+    //globalContext.document.showMessage("can not check:");
     //showAvailableUpdateDialog();
     setUpdateCheckDayOnTomorrow();
   }
@@ -26119,7 +25907,9 @@ function init(context) {
 
 }
 function showMsg(msg) {
-  globalContext.document.showMessage(msg);
+  // globalContext.document.showMessage(msg);
+  console.log("in showMsg");
+  console.log(msg);
 }
 function openUrlInBrowser(url) {
   NSWorkspace.sharedWorkspace().openURL(NSURL.URLWithString(url));
@@ -26142,47 +25932,115 @@ function readLocalData(path) {
   }
 }
 function networkRequest(url, callBackFun) {
+  /*
   // console.log("in networkRequest: \n" + url + " \n " + callBackFun);
-  return fetch(url).then(function (response) {
-    if (!response.ok) {
-      throw Error(response.statusText);
-    }
+  return fetch(url)
+   .then(function (response) {
+  	  if (!response.ok) {
+  	    throw Error(response.statusText);
+  	  }
+  	  return response;
+  	})
+   .then(function (response) {
+  	  return response.json();
+  	})
+   .then(function (result) {
+  	  console.log('Response Params: \n url: ' + url + " \n callBackFun: " + callBackFun);
+  	  console.log(result);
+  	  if(callBackFun !== 'undefined') {
+  	  	callBackFun(result);
+  	  }
+  	  return result;
+  	})
+   .catch(function (error) {
+  	  console.log('Params: \n url: ' + url + " \n callBackFun: " + callBackFun);
+  	  console.log('Looks like there was a problem: \n', error);
+  	});
+     */
+  try {
+    var url = NSURL.URLWithString("" + url);
+    var data = NSData.dataWithContentsOfURL(url);
+    var json = NSJSONSerialization.JSONObjectWithData_options_error(data, 0, nil); // log("parsed data / json");
+    // log(json);
+    // console.log('Params: \n url: ' + url + " \n callBackFun: " + callBackFun);
 
-    return response;
-  }).then(function (response) {
-    return response.json();
-  }).then(function (result) {
-    // console.log('Response Params: \n url: ' + url + " \n callBackFun: " + callBackFun);
-    // console.log(result);
-    if (callBackFun !== 'undefined') {
-      callBackFun(result);
-    }
-
-    return result;
-  }).catch(function (error) {// console.log('Params: \n url: ' + url + " \n callBackFun: " + callBackFun);
-    // console.log('Looks like there was a problem: \n', error);
-  });
+    callBackFun(json);
+  } catch (e) {
+    log("Exception: " + e);
+  }
 }
 function trackEvent(action, label, value) {
-  var kUUIDKey = 'google.analytics.uuid';
-  var uuid = NSUserDefaults.standardUserDefaults().objectForKey(kUUIDKey);
-
+  /*
+  var kUUIDKey = 'google.analytics.uuid'
+  var uuid = NSUserDefaults.standardUserDefaults().objectForKey(kUUIDKey)
   if (!uuid) {
-    uuid = NSUUID.UUID().UUIDString();
-    NSUserDefaults.standardUserDefaults().setObject_forKey(uuid, kUUIDKey);
+    uuid = NSUUID.UUID().UUIDString()
+    NSUserDefaults.standardUserDefaults().setObject_forKey(uuid, kUUIDKey)
   }
-
-  var tid = "UA-64818389-8";
+   var tid = "UA-64818389-8";
   var cid = uuid;
   var ds = "Sketch-" + NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString");
   var baseURL = "https://www.google-analytics.com/debug/collect?v=1&ds=" + ds + "&t=event&tid=" + tid + "&cid=" + cid;
-  baseURL = "https://www.google-analytics.com/collect?v=1&ds=" + ds + "&t=event&tid=" + tid + "&cid=" + cid; // var version = userConfig.localVersion;
-
+  baseURL = "https://www.google-analytics.com/collect?v=1&ds=" + ds + "&t=event&tid=" + tid + "&cid=" + cid;
   var version = context.plugin.version().UTF8String();
-  var trackingURL = baseURL + "&ec=SketchSymbolBrowser-" + version + "&ea=" + action + "&el=" + label + "&ev=" + value;
-  networkRequest(trackingURL);
+   var trackingURL = baseURL + "&ec=SketchSymbolBrowser-" + version + "&ea=" + action + "&el=" + label + "&ev=" + value;
+  // networkRequest(trackingURL);
+  */
+  // console.log("globalContext");
+  // console.log(globalContext);
+  var trackingID = "UA-64818389-8";
+  var userDefaults = NSUserDefaults.standardUserDefaults();
+  var uuidKey = "google.analytics.uuid";
+  var uuid = userDefaults.objectForKey(uuidKey);
+
+  if (!uuid) {
+    uuid = NSUUID.UUID().UUIDString();
+    userDefaults.setObject_forKey(uuid, uuidKey);
+    userDefaults.synchronize();
+  }
+
+  var appName = encodeURI(globalContext.plugin.name()),
+      appId = globalContext.plugin.identifier(),
+      appVersion = globalContext.plugin.version();
+  var url = "https://www.google-analytics.com/collect?v=1"; // Tracking ID
+
+  url += "&tid=" + trackingID; // Source
+
+  url += "&ds=sketch" + MSApplicationMetadata.metadata().appVersion; // Client ID
+
+  url += "&cid=" + uuid; // User GEO location
+
+  url += "&geoid=" + NSLocale.currentLocale().countryCode(); // User language
+
+  url += "&ul=" + NSLocale.currentLocale().localeIdentifier().toLowerCase(); // pageview, screenview, event, transaction, item, social, exception, timing
+
+  url += "&t=event"; // App Name
+
+  url += "&an=" + appName; // App ID
+
+  url += "&aid=" + appId; // App Version
+
+  url += "&av=" + appVersion; // Event category
+
+  url += "&ec=" + encodeURI("SketchSymbolBrowser-" + appVersion); // Event action
+  // url += "&ea=" + encodeURI(eventAction);
+
+  url += "&ea=" + encodeURI(action); // Event label
+  // if (eventLabel) {
+  //     url += "&el=" + encodeURI(eventLabel);
+  // }
+
+  url += "&el=" + encodeURI(label); // Event value
+  // if (eventValue) {
+  //     url += "&ev=" + encodeURI(eventValue);
+  // }
+
+  url += "&ev=" + encodeURI(value); // console.log("new ga url: " + url);
+
+  var session = NSURLSession.sharedSession();
+  var task = session.dataTaskWithURL(NSURL.URLWithString(NSString.stringWithString(url)));
+  task.resume();
 }
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/sketch-polyfill-fetch/lib/index.js */ "./node_modules/sketch-polyfill-fetch/lib/index.js")))
 
 /***/ }),
 
@@ -26247,7 +26105,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
 
-var INDEX_FORMAT_VERSION = 4;
+var INDEX_FORMAT_VERSION = 6;
 var FORCE_REBULD = false;
 var SHOW_DEFAULT_STICKERS = true;
 var _defaultSection = 'DefaultSymbols';
@@ -26293,7 +26151,9 @@ function _makeStickerIndexForLibraries() {
               }
 
               return firstWithId;
-            });
+            }); // log("filttered libraries");
+            // log(libraries);
+
             progressReporter = new _util_progress_reporter__WEBPACK_IMPORTED_MODULE_6__["ProgressReporter"]();
             progressReporter.on('progress', function (progress) {
               return onProgress(progress);
@@ -26446,7 +26306,7 @@ function _buildStickerIndexForLibrary() {
   _buildStickerIndexForLibrary = _asyncToGenerator(
   /*#__PURE__*/
   regeneratorRuntime.mark(function _callee3(libraryId, defaultLibName, document, progressReporter) {
-    var libraryIndex, cachePath, sectionsById, allSymbolInstances, parsedMetadata, allSymbolMasters, symbolStickersMetaData, metaData, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, symbolLayer, symbolInstance, init, last, layerName, allTextLayers, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, textLayer, text, tempParsedMetadata, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, section, _i2, _Array$from, _section, parentId, parentSection, possibleStickers, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, layer, parsedName, nonEmptyItems;
+    var libraryIndex, cachePath, sectionsById, allSymbolInstances, parsedMetadata, allSymbolMasters, symbolStickersMetaData, metaData, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, symbolLayer, symbolInstance, init, last, layerName, allTextLayers, combinedText, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, textLayer, text, tempParsedMetadata, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, section, _i2, _Array$from, _section, parentId, parentSection, possibleStickers, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, layer, parsedName, nonEmptyItems;
 
     return regeneratorRuntime.wrap(function _callee3$(_context3) {
       while (1) {
@@ -26480,12 +26340,22 @@ function _buildStickerIndexForLibrary() {
               symbolLayer = _step3.value;
               // var symbolInstance = symbolLayer.newSymbolInstance();
               symbolInstance = symbolLayer;
-              layerName = symbolInstance.name() + ""; // var ranges = [
-              //               '\ud83c[\udf00-\udfff]', // U+1F300 to U+1F3FF
-              //               '\ud83d[\udc00-\ude4f]', // U+1F400 to U+1F64F
-              //               '\ud83d[\ude80-\udeff]'  // U+1F680 to U+1F6FF
-              //             ];
-              // layerName = layerName.replace(new RegExp(ranges.join('|'), 'g'), '').replace(/[&#,+()$~%.'":*?<>{}-]/g, '');
+              layerName = symbolInstance.name() + ""; // if(layerName.indexOf("@") < 0) {
+              //   layerName = layerName.replace(/[^a-zA-Z0-9 \/_]/g, '');
+              //   if(layerName.lastIndexOf("/") > 0) {
+              //     init = (layerName.substring(0, layerName.lastIndexOf("/") + 0)).replace(/\s\s+/g, ' ').replace(/\//g,'_').replace(/\s/g,'');
+              //     last = layerName.substring(layerName.lastIndexOf("/") + 1, layerName.length);
+              //   } else {
+              //     init = layerName.replace(/\s/g,'');
+              //     last = layerName;
+              //   }
+              //   metaData = {};
+              //   metaData.name = "@" + _defaultSection + "." + init;
+              //   // symbolInstance.name = layerName + " " + "@" + _defaultSection + "." + init;
+              //   symbolStickersMetaData.push(metaData);
+              //   allSymbolInstances.push(symbolInstance);
+              //   // symbolInstance.name = layerName;
+              // }
 
               layerName = layerName.replace(/[^a-zA-Z0-9 \/_]/g, '');
 
@@ -26493,27 +26363,20 @@ function _buildStickerIndexForLibrary() {
                 init = layerName.substring(0, layerName.lastIndexOf("/") + 0).replace(/\s\s+/g, ' ').replace(/\//g, '_').replace(/\s/g, '');
                 last = layerName.substring(layerName.lastIndexOf("/") + 1, layerName.length);
               } else {
-                // var layerSpliter = "/";
-                // var layerSpliterCount = ((layerName.match(/[\/]/g,) || []).length);
-                // if(layerSpliterCount > 0) {
-                //   if(layerSpliterCount >= 3) {
-                //     var position = getPosition(layerName, layerSpliter, Math.min(3, Math.floor(layerSpliterCount/2)));
-                //   } else {
-                //     var position = layerName.indexOf(layerSpliter);
-                //   }
-                //   init = (layerName.substring(0, position + 0)).replace(/\s\s+/g, ' ').replace(/\//g,'_').replace(/\s/g,'');
-                //   last = layerName.substring(position, layerName.length);
-                // } else {
                 init = layerName.replace(/\s/g, '');
                 last = layerName;
               }
 
               metaData = {};
-              metaData.name = "@" + _defaultSection + "." + init;
-              symbolInstance.name = layerName + " " + "@" + _defaultSection + "." + init;
+              metaData.name = "@" + _defaultSection + "." + init; // symbolInstance.name = layerName + " " + "@" + _defaultSection + "." + init;
+
               symbolStickersMetaData.push(metaData);
-              allSymbolInstances.push(symbolInstance);
-            }
+              allSymbolInstances.push(symbolInstance); // symbolInstance.name = layerName;
+            } // log('symbolStickersMetaData');
+            // log(symbolStickersMetaData);
+            // log('getStickersMetadata(symbolStickersMetaData)');
+            // log(getStickersMetadata(symbolStickersMetaData));
+
 
             _context3.next = 22;
             break;
@@ -26549,20 +26412,23 @@ function _buildStickerIndexForLibrary() {
             return _context3.finish(22);
 
           case 30:
-            parsedMetadata = parseStickerMetadata(getStickersMetadata(symbolStickersMetaData));
+            parsedMetadata = parseStickerMetadata(getStickersMetadata(symbolStickersMetaData)); // log('parsedMetadata');
+            // log(parsedMetadata);
 
           case 31:
             // second, find sticker sections (stored in text layers)
             allTextLayers = _util__WEBPACK_IMPORTED_MODULE_4__["getAllLayersMatchingPredicate"](document, NSPredicate.predicateWithFormat('className == %@', 'MSTextLayer'));
             allTextLayers.reverse(); // layer list order, not stacking order
 
+            log("allTextLayers: " + allTextLayers.length);
+            combinedText = "";
             _iteratorNormalCompletion4 = true;
             _didIteratorError4 = false;
             _iteratorError4 = undefined;
-            _context3.prev = 36;
+            _context3.prev = 38;
             _iterator4 = allTextLayers[Symbol.iterator]();
 
-          case 38:
+          case 40:
             if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
               _context3.next = 49;
               break;
@@ -26572,20 +26438,34 @@ function _buildStickerIndexForLibrary() {
             text = textLayer.stringValue();
 
             if (!(text.indexOf('!Sticker') < 0)) {
-              _context3.next = 43;
+              _context3.next = 45;
               break;
             }
 
             return _context3.abrupt("continue", 46);
 
-          case 43:
-            tempParsedMetadata = parseStickerMetadata(text);
-            Array.prototype.push.apply(parsedMetadata.sections, tempParsedMetadata.sections);
-            parsedMetadata.libraryMeta = tempParsedMetadata.libraryMeta;
+          case 45:
+            combinedText = combinedText + " \r\n\r\n\r\n" + text; // let tempParsedMetadata = parseStickerMetadata(text);
+            // // log('symbolStickersMetaData');
+            // // log(parsedMetadata.sections.length);
+            // // log(parsedMetadata.sections);
+            // // log('otherStickersMetaData');
+            // // log(tempParsedMetadata.sections.length);
+            // // log(tempParsedMetadata.sections);
+            // if(SHOW_DEFAULT_STICKERS) {
+            //   Array.prototype.push.apply(parsedMetadata.sections, tempParsedMetadata.sections);
+            // } else {
+            //   parsedMetadata.sections = tempParsedMetadata.sections;
+            // }
+            // log('parsedMetadata.sections');
+            // log(parsedMetadata.sections.length);
+            // log(parsedMetadata.sections);
+            // // Array.prototype.push.apply(parsedMetadata.sections, tempParsedMetadata.sections);
+            // parsedMetadata.libraryMeta = tempParsedMetadata.libraryMeta;
 
           case 46:
             _iteratorNormalCompletion4 = true;
-            _context3.next = 38;
+            _context3.next = 40;
             break;
 
           case 49:
@@ -26594,7 +26474,7 @@ function _buildStickerIndexForLibrary() {
 
           case 51:
             _context3.prev = 51;
-            _context3.t1 = _context3["catch"](36);
+            _context3.t1 = _context3["catch"](38);
             _didIteratorError4 = true;
             _iteratorError4 = _context3.t1;
 
@@ -26623,57 +26503,71 @@ function _buildStickerIndexForLibrary() {
             return _context3.finish(55);
 
           case 63:
+            // log("combinedText");
+            // log(combinedText);
+            tempParsedMetadata = parseStickerMetadata(combinedText);
+
+            if (SHOW_DEFAULT_STICKERS) {
+              Array.prototype.push.apply(parsedMetadata.sections, tempParsedMetadata.sections);
+            } else {
+              parsedMetadata.sections = tempParsedMetadata.sections;
+            } // log('parsedMetadata.sections');
+            // log(parsedMetadata.sections.length);
+            // log(parsedMetadata.sections);
+            // Array.prototype.push.apply(parsedMetadata.sections, tempParsedMetadata.sections);
+
+
+            parsedMetadata.libraryMeta = tempParsedMetadata.libraryMeta;
             _iteratorNormalCompletion5 = true;
             _didIteratorError5 = false;
             _iteratorError5 = undefined;
-            _context3.prev = 66;
+            _context3.prev = 69;
 
             for (_iterator5 = parsedMetadata.sections[Symbol.iterator](); !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
               section = _step5.value;
               section.libraryId = libraryId;
 
-              if (section.id in sectionsById) {
-                log("Duplicate sticker section id ".concat(section.id, ", skipping duplicates"));
+              if (section.id in sectionsById) {// log(`Duplicate sticker section id ${section.id}, skipping duplicates`);
               } else {
                 sectionsById[section.id] = section;
                 libraryIndex.sections.push(section);
               }
             }
 
-            _context3.next = 74;
+            _context3.next = 77;
             break;
 
-          case 70:
-            _context3.prev = 70;
-            _context3.t2 = _context3["catch"](66);
+          case 73:
+            _context3.prev = 73;
+            _context3.t2 = _context3["catch"](69);
             _didIteratorError5 = true;
             _iteratorError5 = _context3.t2;
 
-          case 74:
-            _context3.prev = 74;
-            _context3.prev = 75;
+          case 77:
+            _context3.prev = 77;
+            _context3.prev = 78;
 
             if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
               _iterator5.return();
             }
 
-          case 77:
-            _context3.prev = 77;
+          case 80:
+            _context3.prev = 80;
 
             if (!_didIteratorError5) {
-              _context3.next = 80;
+              _context3.next = 83;
               break;
             }
 
             throw _iteratorError5;
 
-          case 80:
+          case 83:
+            return _context3.finish(80);
+
+          case 84:
             return _context3.finish(77);
 
-          case 81:
-            return _context3.finish(74);
-
-          case 82:
+          case 85:
             if (parsedMetadata.libraryMeta.title) {
               libraryIndex.title = parsedMetadata.libraryMeta.title;
             }
@@ -26685,9 +26579,9 @@ function _buildStickerIndexForLibrary() {
 
             _i2 = 0, _Array$from = Array.from(libraryIndex.sections);
 
-          case 85:
+          case 88:
             if (!(_i2 < _Array$from.length)) {
-              _context3.next = 99;
+              _context3.next = 102;
               break;
             }
 
@@ -26695,49 +26589,51 @@ function _buildStickerIndexForLibrary() {
             parentId = _section.id.substr(0, _section.id.lastIndexOf('.'));
 
             if (!parentId) {
-              _context3.next = 96;
+              _context3.next = 99;
               break;
             }
 
             parentSection = sectionsById[parentId];
 
             if (parentSection) {
-              _context3.next = 93;
+              _context3.next = 96;
               break;
             }
 
             log("Unknown parent section ".concat(parentId));
-            return _context3.abrupt("continue", 96);
+            return _context3.abrupt("continue", 99);
 
-          case 93:
+          case 96:
             parentSection.items = parentSection.items || [];
             parentSection.items.push(_section); // remove from the root
 
             libraryIndex.sections.splice(libraryIndex.sections.indexOf(_section), 1);
 
-          case 96:
+          case 99:
             _i2++;
-            _context3.next = 85;
+            _context3.next = 88;
             break;
 
-          case 99:
+          case 102:
             libraryIndex.sections.push(libraryIndex.sections.shift()); // go through all layers tagged to a section
 
             possibleStickers = _util__WEBPACK_IMPORTED_MODULE_4__["getAllLayersMatchingPredicate"](document, NSPredicate.predicateWithFormat('name matches ".*@.*"'));
             possibleStickers.reverse(); // layer list order, not stacking order
             // possibleStickers.push.apply(possibleStickers, allSymbolMasters);
 
-            possibleStickers.push.apply(possibleStickers, allSymbolInstances);
+            possibleStickers.push.apply(possibleStickers, allSymbolInstances); // log('possibleStickers');
+            // log(possibleStickers);
+
             progressReporter.total = possibleStickers.length;
             _iteratorNormalCompletion6 = true;
             _didIteratorError6 = false;
             _iteratorError6 = undefined;
-            _context3.prev = 107;
+            _context3.prev = 110;
             _iterator6 = possibleStickers[Symbol.iterator]();
 
-          case 109:
+          case 112:
             if (_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done) {
-              _context3.next = 121;
+              _context3.next = 124;
               break;
             }
 
@@ -26745,16 +26641,23 @@ function _buildStickerIndexForLibrary() {
             progressReporter.increment();
 
             if (!(layer instanceof MSTextLayer && String(layer.name()).startsWith('!Sticker'))) {
-              _context3.next = 114;
+              _context3.next = 117;
               break;
             }
 
-            return _context3.abrupt("continue", 118);
+            return _context3.abrupt("continue", 121);
 
-          case 114:
+          case 117:
+            // let parsedName;
+            // if(layer instanceof MSSymbolMaster && !String(layer.name()).startsWith('@')) {
+            //   parsedName = parseLayerName(layer.name(), sectionId => sectionId in sectionsById, true);
+            // } else {
+            //   parsedName = parseLayerName(layer.name(), sectionId => sectionId in sectionsById, false);
+            // }
             parsedName = parseLayerName(layer.name(), function (sectionId) {
               return sectionId in sectionsById;
-            }); // if this is an icon, capture it as the icon
+            }); // log(parsedName);
+            // if this is an icon, capture it as the icon
 
             if (parsedName.specialInstructions.icon) {
               libraryIndex.iconPath = _skpm_path__WEBPACK_IMPORTED_MODULE_1___default.a.join(cachePath, 'icon.png');
@@ -26762,14 +26665,14 @@ function _buildStickerIndexForLibrary() {
             }
 
             if (!(parsedName.isSticker || layer instanceof MSSymbolMaster)) {
-              _context3.next = 118;
+              _context3.next = 121;
               break;
             }
 
             return _context3.delegateYield(
             /*#__PURE__*/
             regeneratorRuntime.mark(function _callee2() {
-              var layerId, id, type, layerInfo, imm, serializedLayer, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, sectionId, _section2, found;
+              var layerId, id, type, layerInfo, imm, serializedLayer, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, _sectionId, _section2, found;
 
               return regeneratorRuntime.wrap(function _callee2$(_context2) {
                 while (1) {
@@ -26795,6 +26698,7 @@ function _buildStickerIndexForLibrary() {
                       if (layer instanceof MSSymbolMaster) {
                         // convert symbolMaster to symbolInstance
                         layer = layer.newSymbolInstance();
+                        layerInfo.type = 'symbol';
                       } // capture layer content
 
 
@@ -26814,8 +26718,8 @@ function _buildStickerIndexForLibrary() {
                       _context2.prev = 15;
 
                       for (_iterator7 = parsedName.sectionIds[Symbol.iterator](); !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-                        sectionId = _step7.value;
-                        _section2 = sectionsById[sectionId];
+                        _sectionId = _step7.value;
+                        _section2 = sectionsById[_sectionId];
                         _section2.items = _section2.items || [];
                         found = _section2.items.some(function (el) {
                           return el.id === id;
@@ -26865,48 +26769,48 @@ function _buildStickerIndexForLibrary() {
                   }
                 }
               }, _callee2, null, [[15, 19, 23, 31], [24,, 26, 30]]);
-            })(), "t3", 118);
-
-          case 118:
-            _iteratorNormalCompletion6 = true;
-            _context3.next = 109;
-            break;
+            })(), "t3", 121);
 
           case 121:
-            _context3.next = 127;
+            _iteratorNormalCompletion6 = true;
+            _context3.next = 112;
             break;
 
-          case 123:
-            _context3.prev = 123;
-            _context3.t4 = _context3["catch"](107);
+          case 124:
+            _context3.next = 130;
+            break;
+
+          case 126:
+            _context3.prev = 126;
+            _context3.t4 = _context3["catch"](110);
             _didIteratorError6 = true;
             _iteratorError6 = _context3.t4;
 
-          case 127:
-            _context3.prev = 127;
-            _context3.prev = 128;
+          case 130:
+            _context3.prev = 130;
+            _context3.prev = 131;
 
             if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
               _iterator6.return();
             }
 
-          case 130:
-            _context3.prev = 130;
+          case 133:
+            _context3.prev = 133;
 
             if (!_didIteratorError6) {
-              _context3.next = 133;
+              _context3.next = 136;
               break;
             }
 
             throw _iteratorError6;
 
-          case 133:
+          case 136:
+            return _context3.finish(133);
+
+          case 137:
             return _context3.finish(130);
 
-          case 134:
-            return _context3.finish(127);
-
-          case 135:
+          case 138:
             // cull any sections that don't indirectly or directly contain stickers
             nonEmptyItems = function nonEmptyItems(items) {
               return items.filter(function (item) {
@@ -26923,12 +26827,12 @@ function _buildStickerIndexForLibrary() {
             libraryIndex.title = libraryIndex.title || defaultLibName || _util__WEBPACK_IMPORTED_MODULE_4__["getDocumentName"](document);
             return _context3.abrupt("return", libraryIndex);
 
-          case 139:
+          case 142:
           case "end":
             return _context3.stop();
         }
       }
-    }, _callee3, null, [[14, 18, 22, 30], [23,, 25, 29], [36, 51, 55, 63], [56,, 58, 62], [66, 70, 74, 82], [75,, 77, 81], [107, 123, 127, 135], [128,, 130, 134]]);
+    }, _callee3, null, [[14, 18, 22, 30], [23,, 25, 29], [38, 51, 55, 63], [56,, 58, 62], [69, 73, 77, 85], [78,, 80, 84], [110, 126, 130, 138], [131,, 133, 137]]);
   }));
   return _buildStickerIndexForLibrary.apply(this, arguments);
 }
@@ -27009,6 +26913,62 @@ var SPECIAL_INSTRUCTIONS = new Set(['icon']);
  * that returns true if the given section ID (e.g. "@Foo.Bar") is a
  * valid section ID.
  */
+// function parseLayerName(name, isValidSectionIdFn, isSymbol) {
+//   let parsed = {
+//     isSticker: false,
+//     sectionIds: [],
+//     sanitizedName: name,
+//     specialInstructions: {},
+//   };
+//   log(name);
+//   if(isSymbol) {
+//     name = getSymbolNameWithSectionFn(name);
+//   }
+//   name = String(name || '');
+//   let unspecialParts = name
+//       .split(/(@+[\w\.]+)/)
+//       .filter(part => {
+//         if ('@' === part.charAt(0)) {
+//           if ('@' === part.charAt(1)) {
+//             // special instruction
+//             let instr = part.slice(2);
+//             if (SPECIAL_INSTRUCTIONS.has(instr)) {
+//               parsed.specialInstructions[instr] = true;
+//               return false; // remove from sanitized name
+//             }
+//           } else {
+//             // possible section id
+//             if (isValidSectionIdFn(part)) {
+//               parsed.sectionIds.push(part);
+//               parsed.isSticker = true;
+//               return false // remove from sanitized name
+//             } else {
+//                 log(`Sticker section not found ${sectionId} for layer named ${name}`);
+//                 // continue;
+//             }
+//           }
+//         }
+//         return true;
+//       });
+//   parsed.sanitizedName = unspecialParts.join('').replace(/^\s+|\s+$/g, '').replace(/\s+/, ' ');
+//   return parsed;
+// }
+
+function getSymbolNameWithSectionFn(name) {
+  var init, last, newName;
+  name = name.replace(/[^a-zA-Z0-9 \/_]/g, '');
+
+  if (name.lastIndexOf("/") > 0) {
+    init = name.substring(0, name.lastIndexOf("/") + 0).replace(/\s\s+/g, ' ').replace(/\//g, '_').replace(/\s/g, '');
+    last = name.substring(name.lastIndexOf("/") + 1, name.length);
+  } else {
+    init = name.replace(/\s/g, '');
+    last = name;
+  }
+
+  newName = name + "@" + _defaultSection + "." + init;
+  return newName;
+}
 
 function parseLayerName(name, isValidSectionIdFn) {
   var parsed = {
@@ -27018,6 +26978,13 @@ function parseLayerName(name, isValidSectionIdFn) {
     specialInstructions: {}
   };
   name = String(name || '');
+
+  if (!name.includes("@")) {
+    name = getSymbolNameWithSectionFn(name);
+  } else {
+    log(name);
+  }
+
   var unspecialParts = name.split(/(@+[\w\.]+)/).filter(function (part) {
     if ('@' === part.charAt(0)) {
       if ('@' === part.charAt(1)) {
@@ -27034,15 +27001,16 @@ function parseLayerName(name, isValidSectionIdFn) {
           parsed.sectionIds.push(part);
           parsed.isSticker = true;
           return false; // remove from sanitized name
-        } else {//   log(`Sticker section not found ${sectionId} for layer named ${name}`);
-            //   continue;
-          }
+        } else {
+          log("Sticker section not found ".concat(sectionId, " for layer named ").concat(name)); // continue;
+        }
       }
     }
 
     return true;
   });
-  parsed.sanitizedName = unspecialParts.join('').replace(/^\s+|\s+$/g, '').replace(/\s+/, ' ');
+  parsed.sanitizedName = unspecialParts.join('').replace(/^\s+|\s+$/g, '').replace(/\s+/, ' '); // log("name: " + name + "    |    sanitizedName: " + parsed.sanitizedName);
+
   return parsed;
 }
 
@@ -27050,7 +27018,7 @@ function getStickersMetadata(stickersMetaData) {
   var sectionPrefix = '!StickerSection ';
   var title = 'title: ';
   var hideNames = 'hideNames: false';
-  var description = 'description: You will find all of your symbols here.';
+  var description = 'description: All of your symbols show up here. Symbol Browser will arrange all of your symbols in a groups based on the names. <br/><br/><br/><b>Want to define your own groupings?</b><br/> Follow below link to see how to define new sections. <br/><br/> <a class="sticker-root-section__link" href="https://github.com/pratikjshah/symbol-browser/wiki/Create-custom-sections-for-Symbols" style="text-alignn:center;">View Documentation</a>';
   var backgroundEach = "backgroundEach: '#ffffff'";
   var layout = 'layout: row';
   var yamlStickersMetadata = '';
@@ -27166,8 +27134,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
-var THREAD_DICT_KEY = 'stickers.BrowserWindow';
-var UI_MODE = 'cover'; // MSTheme.sharedTheme().isDark()
+var THREAD_DICT_KEY = 'stickers.BrowserWindow'; // const UI_MODE = 'cover';
+
+var UI_MODE = 'modal'; // MSTheme.sharedTheme().isDark()
 
 var DARK_MODE = NSAppKitVersionNumber >= 1671 && 'Dark' === String(NSUserDefaults.standardUserDefaults().stringForKey('AppleInterfaceStyle'));
 var BUILD_SKETCH_53_BETA_1 = 71402;
@@ -27191,10 +27160,13 @@ function () {
       var browserWindow = this.getPersistedObj();
 
       if (browserWindow) {
-        browserWindow.close();
-        this.setPersistedObj(null);
+        browserWindow.focus();
+        browserWindow.show(); // browserWindow.moveTop();
+        // browserWindow.close();
+        // this.setPersistedObj(null);
       } else {
         this.createAndShow();
+        this.context.document.showMessage("\u231B\uFE0F Initializing Symbol Browser...");
       }
     }
   }, {
@@ -27241,11 +27213,13 @@ function () {
       this.browserWindow = new sketch_module_web_view__WEBPACK_IMPORTED_MODULE_2___default.a({
         backgroundColor: '#ffffffff',
         identifier: 'stickers.web',
-        width: 800,
-        height: 600,
+        width: 1200,
+        height: 800,
         show: false,
-        frame: UI_MODE == 'palette',
-        hasShadow: UI_MODE == 'palette',
+        frame: UI_MODE == 'modal',
+        modal: UI_MODE == 'modal',
+        hasShadow: UI_MODE == 'modal',
+        title: 'Symbol Browser',
         acceptsFirstMouse: true
       });
       this.webContents = this.browserWindow.webContents;
@@ -27264,11 +27238,20 @@ function () {
         this.browserWindow._panel.setHidesOnDeactivate(false);
       }
 
+      if (UI_MODE == 'modal') {
+        this.browserWindow.setResizable(true); // this.browserWindow._panel.setFrame_display_animate_(docWindow.frame(), false, false);
+
+        this.browserWindow._panel.setHidesOnDeactivate(false);
+      }
+
       this.browserWindow.once('ready-to-show', function () {
         _this.browserWindow.show();
 
         if (UI_MODE == 'cover') {
           docWindow.addChildWindow_ordered_(_this.browserWindow._panel, NSWindowAbove);
+        }
+
+        if (UI_MODE == 'modal') {// docWindow.addChildWindow_ordered_(this.browserWindow._panel, NSWindowAbove);
         }
       });
       this.browserWindow.loadURL(String(this.context.plugin.urlForResourceNamed('index.html') + "?uiMode=".concat(UI_MODE, "&darkMode=").concat(DARK_MODE ? 1 : 0)));
@@ -27342,6 +27325,9 @@ function () {
         if (UI_MODE == 'cover') {
           _this2.browserWindow.close();
         }
+
+        if (UI_MODE == 'modal') {// this.browserWindow.close();
+        }
       }); // add a handler for a call from web content's javascript
 
       this.webContents.on('addLibraryColors', function (libraryId) {
@@ -27369,8 +27355,13 @@ function () {
 
       var serializedLayerJson = _skpm_fs__WEBPACK_IMPORTED_MODULE_1___default.a.readFileSync(this.getStickerCachedContentPath(stickerId), {
         encoding: 'utf8'
-      });
-      var decodedImmutableObj = MSJSONDataUnarchiver.unarchiveObjectWithString_asVersion_corruptionDetected_error(serializedLayerJson, archiveVersion || 999, null, null);
+      }); // let decodedImmutableObj = MSJSONDataUnarchiver
+      //     .unarchiveObjectWithString_asVersion_corruptionDetected_error(
+      //         serializedLayerJson, archiveVersion || 999, null, null);
+
+      var unarchiveFn = // method was renamed in Sketch 64 -- extra 'd')
+      MSJSONDataUnarchiver.unarchivedObjectWithString_asVersion_corruptionDetected_error || MSJSONDataUnarchiver.unarchiveObjectWithString_asVersion_corruptionDetected_error;
+      var decodedImmutableObj = unarchiveFn(serializedLayerJson, archiveVersion || 999, null, null);
       var layer = decodedImmutableObj.newMutableCounterpart(); // create a dummy document and import the layer into it, so that
       // foreign symbols can be created in it and sent along with the layer
       // to the pasteboard
@@ -28117,6 +28108,28 @@ module.exports = require("buffer");
 /***/ (function(module, exports) {
 
 module.exports = require("sketch");
+
+/***/ }),
+
+/***/ "sketch/settings":
+/*!**********************************!*\
+  !*** external "sketch/settings" ***!
+  \**********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("sketch/settings");
+
+/***/ }),
+
+/***/ "sketch/ui":
+/*!****************************!*\
+  !*** external "sketch/ui" ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("sketch/ui");
 
 /***/ }),
 

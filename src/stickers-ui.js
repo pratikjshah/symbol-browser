@@ -25,7 +25,8 @@ import * as colorUtil from './color-util';
 import {makeStickerIndexForLibraries} from './sticker-index';
 
 const THREAD_DICT_KEY = 'stickers.BrowserWindow';
-const UI_MODE = 'cover';
+// const UI_MODE = 'cover';
+const UI_MODE = 'modal';
 // MSTheme.sharedTheme().isDark()
 const DARK_MODE = (NSAppKitVersionNumber >= 1671 &&
     'Dark' === String(NSUserDefaults.standardUserDefaults().stringForKey('AppleInterfaceStyle')));
@@ -44,10 +45,14 @@ export class StickersUI {
   showHide() {
     let browserWindow = this.getPersistedObj();
     if (browserWindow) {
-      browserWindow.close();
-      this.setPersistedObj(null);
+      browserWindow.focus();
+      browserWindow.show();
+      // browserWindow.moveTop();
+      // browserWindow.close();
+      // this.setPersistedObj(null);
     } else {
       this.createAndShow();
+      this.context.document.showMessage(`⌛️ Initializing Symbol Browser...`);
     }
   }
 
@@ -88,11 +93,13 @@ export class StickersUI {
     this.browserWindow = new BrowserWindow({
       backgroundColor: '#ffffffff',
       identifier: 'stickers.web',
-      width: 800,
-      height: 600,
+      width: 1200,
+      height: 800,
       show: false,
-      frame: UI_MODE == 'palette',
-      hasShadow: UI_MODE == 'palette',
+      frame: UI_MODE == 'modal',
+      modal: UI_MODE == 'modal',
+      hasShadow: UI_MODE == 'modal',
+      title: 'Symbol Browser',
       acceptsFirstMouse: true,
     });
 
@@ -111,10 +118,18 @@ export class StickersUI {
       this.browserWindow._panel.setFrame_display_animate_(docWindow.frame(), false, false);
       this.browserWindow._panel.setHidesOnDeactivate(false);
     }
+    if (UI_MODE == 'modal') {
+      this.browserWindow.setResizable(true);
+      // this.browserWindow._panel.setFrame_display_animate_(docWindow.frame(), false, false);
+      this.browserWindow._panel.setHidesOnDeactivate(false);
+    }
     this.browserWindow.once('ready-to-show', () => {
       this.browserWindow.show();
       if (UI_MODE == 'cover') {
         docWindow.addChildWindow_ordered_(this.browserWindow._panel, NSWindowAbove);
+      }
+      if (UI_MODE == 'modal') {
+        // docWindow.addChildWindow_ordered_(this.browserWindow._panel, NSWindowAbove);
       }
     });
 
@@ -178,6 +193,9 @@ export class StickersUI {
       if (UI_MODE == 'cover') {
         this.browserWindow.close();
       }
+      if (UI_MODE == 'modal') {
+        // this.browserWindow.close();
+      }
     });
 
     // add a handler for a call from web content's javascript
@@ -203,9 +221,13 @@ export class StickersUI {
     // deserialize layer
     let serializedLayerJson = fs.readFileSync(
         this.getStickerCachedContentPath(stickerId), {encoding: 'utf8'});
-    let decodedImmutableObj = MSJSONDataUnarchiver
-        .unarchiveObjectWithString_asVersion_corruptionDetected_error(
-            serializedLayerJson, archiveVersion || 999, null, null);
+    // let decodedImmutableObj = MSJSONDataUnarchiver
+    //     .unarchiveObjectWithString_asVersion_corruptionDetected_error(
+    //         serializedLayerJson, archiveVersion || 999, null, null);
+    let unarchiveFn = ( // method was renamed in Sketch 64 -- extra 'd')
+        MSJSONDataUnarchiver.unarchivedObjectWithString_asVersion_corruptionDetected_error ||
+        MSJSONDataUnarchiver.unarchiveObjectWithString_asVersion_corruptionDetected_error);
+    let decodedImmutableObj = unarchiveFn(serializedLayerJson, archiveVersion || 999, null, null);
     let layer = decodedImmutableObj.newMutableCounterpart();
 
     // create a dummy document and import the layer into it, so that

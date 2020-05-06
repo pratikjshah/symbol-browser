@@ -1,3 +1,4 @@
+
 # Sketch Symbol Browser
 
 <img src="https://raw.githubusercontent.com/pratikjshah/symbol-browser/master/art/symbol-browser-logo.png" alt="Sketch Symbol Browser" width="160" align="right" />
@@ -6,15 +7,14 @@
 <br/>
 
 This plugin lets you..
-- Browse Sketch symbols
-- Drag-N-Drop UI Kit / Stickers
+- Browse Symbols from multiple Libraries (All in one place)
+- True-to-size symbol preview
+- Drag-N-Drop Symbols and UI Kit / Stickers
 - Add documentation to your Sketch Library
 - `New` Share instances of the Symbol
 - `New` Works offline
 
-<a href="http://symbol-browser.pratikshah.website">
-Visit plugin website for more.
-</a>
+Visit plugin website for more: <a href="http://symbol-browser.pratikshah.website">http://symbol-browser.pratikshah.website</a>
 <br/><br/>
 
 
@@ -30,22 +30,16 @@ Visit plugin website for more.
 
 <br/>
 
-## Important links
-<div>
-  <h4>
-    <a href="https://github.com/pratikjshah/symbol-browser/releases/latest/download/symbol-browser.sketchplugin.zip">
-      Download
-    </a>
-    <span> | </span>
-    <a href="https://github.com/pratikjshah/symbol-browser/#faq">
-      Help and FAQs
-    </a>
-    <span> | </span>
-    <a href="https://github.com/pratikjshah/symbol-browser/wiki/Getting-started-with-Symbols-Browser#steps-to-get-started">
-      Getting Started with Symbol Browser
-    </a>
-  </h4>
-</div>
+#### Important links:
+* 🚀 [Release Notes](http://symbol-browser.pratikshah.website/#features)
+* 👨‍🔬 [Example Sketch library](https://www.sketch.com/s/f577ec9e-127a-4c5a-bd26-22ba9ddb64f5)
+
+
+#### Wiki Pages:
+* [Getting started with Symbols Browser](https://github.com/pratikjshah/symbol-browser/wiki/Getting-started-with-Symbols-Browser)
+* [Create custom sections for Symbols](https://github.com/pratikjshah/symbol-browser/wiki/Create-custom-sections-for-Symbols)
+* [Understanding Metadata syntax](https://github.com/pratikjshah/symbol-browser/wiki/Understanding-Metadata-syntax)
+* [Sample Metadata code](https://github.com/pratikjshah/symbol-browser/wiki/Understanding-Metadata-syntax)
 
 <br/>
 
@@ -58,12 +52,16 @@ Visit plugin website for more.
 
 <div>
   <h4>
-    <a href="https://sketch.cloud/s/DVnWq">
+    <a href="https://www.sketch.com/s/f577ec9e-127a-4c5a-bd26-22ba9ddb64f5">
       Example Sketch Library
     </a>    
     <span> | </span>
     <a href="https://github.com/pratikjshah/symbol-browser/wiki/Getting-started-with-Symbols-Browser#steps-to-get-started">
       Getting Started with Symbol Browser
+    </a>
+    <span> | </span>
+    <a href="https://github.com/pratikjshah/symbol-browser/wiki/Create-custom-sections-for-Symbols">
+      Create custom Symbol groups
     </a>
   </h4>
 </div>

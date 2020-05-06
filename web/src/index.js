@@ -54,15 +54,28 @@ class StickersPage {
     StickersClient.once('loaded', rawStickerIndex => {
       this.vue.stickerIndex = this.processRawStickerIndex(rawStickerIndex);
       this.vue.$nextTick(() => {
-        $('.header-area__search-field').focus();
+        // $('.header-area__search-field').focus();
+        if($('*[data-key="'+localStorage.getItem('activeLibrary')+'"]') == null) {
+          $('*[data-key="all"]').click();
+        } else {
+          $('*[data-key="'+localStorage.getItem('activeLibrary')+'"]').click();
+        }
         this.loadVisibleStickers();
+        if(localStorage.getItem('hasUpdates') !== null && localStorage.getItem('hasUpdates') == true) {
+          $(document.body).addClass('hasUpdates');
+        }
       });
     });
   }
 
   processRawStickerIndex(stickerIndex) {
+
     stickerIndex.libraries = stickerIndex.libraries
         .filter(lib => !!lib.sections.length);
+
+    if(stickerIndex.libraries.length <= 1) {
+      $(document.body).addClass('hide-navigation');
+    }
 
     for (let library of stickerIndex.libraries) {
       for (let section of library.sections) {
@@ -113,7 +126,8 @@ class StickersPage {
 
     this.vueGlobal = new Vue({
       data: {
-        searchText: ''
+        searchText: '',
+        anyResults: false
       },
     });
 
@@ -168,7 +182,7 @@ class StickersPage {
           library.colorsAdded = true;
         },
         closeWindow() {
-          StickersClient.close();
+          // StickersClient.close();
         },
         onSearchKeydown(ev) {
           if (ev.keyCode == 27) {
@@ -207,9 +221,19 @@ class StickersPage {
   }
 
   updateSearch() {
+    
+    let query = this.vueGlobal.searchText;
+    localStorage.setItem("query", query);
+
     // TODO: move this to a watcher in vueGlobal
     this.vue.$nextTick(() => {
-      const re = this.regexForSearchText(this.vueGlobal.searchText);
+      const re = this.regexForSearchText(query);
+
+      // if(query.length < 1) {
+      //   console.log("Clear search and go back to selected tab");
+      // }
+
+
       const findIn = s => this.vueGlobal.searchText ? (s || '').search(re) >= 0 : true;
 
       const visitItem = item => {
@@ -246,7 +270,25 @@ class StickersPage {
       };
 
       let anyResults = false;
-      for (const library of this.vue.stickerIndex.libraries) {
+      let selectedLibraries = this.vue.stickerIndex.libraries;
+      let searchableLibraries;
+      let activeLibrary = localStorage.getItem('activeLibrary');
+      localStorage.setItem("beforeSearchActiveLibrary", activeLibrary);
+
+      // console.log("selectedLibraries");
+      // console.log(selectedLibraries);
+      // console.log("activeLibrary");
+      // console.log(activeLibrary);
+
+      if (activeLibrary !== 'all') {
+        searchableLibraries = selectedLibraries.filter(obj => {
+          return obj.id == activeLibrary
+        });
+      } else {
+        searchableLibraries = selectedLibraries;
+      }
+
+      for (const library of searchableLibraries) {
         let foundInLibrary = false;
         for (const section of library.sections) {
           let found;
@@ -268,8 +310,14 @@ class StickersPage {
         library._hide = !foundInLibrary;
       }
 
+      if (typeof anyResults === 'undefined') {
+        anyResults = false;
+      }
+
+      this.vueGlobal.anyResults = anyResults;
+
       this.vue.$forceUpdate();
-      $(document.body).toggleClass('has-active-search', !!this.vueGlobal.searchText);
+      $(document.body).toggleClass('has-active-search', (!!this.vueGlobal.searchText && anyResults));
       $(document.body).toggleClass('no-search-results', !anyResults);
       this.vue.$nextTick(() => {
         this.loadVisibleStickers();
@@ -302,6 +350,40 @@ class StickersPage {
         height: rect.bottom - rect.top
       };
       StickersClient.startDragging(stickerId, rect);
+    });
+
+    if(localStorage.getItem('activeLibrary') == null) {
+      localStorage.setItem("activeLibrary", 'all');
+    }
+
+    if(localStorage.getItem('beforeSearchActiveLibrary') == null) {
+      localStorage.setItem("beforeSearchActiveLibrary", 'all');
+    }
+
+    $(document).on('click', '.library-tab', ev => {
+      $(ev.target).addClass('active');
+      $(ev.target).siblings().removeClass('active');
+
+      var key = $(ev.target).attr('data-key');
+      var libraryContainer = '.sticker-library-container';
+
+      localStorage.setItem("activeLibrary", key);
+
+      if(key === 'all') {
+        $(libraryContainer).show();
+      } else {
+        $('#' + key + libraryContainer).show();
+        $('#' + key + libraryContainer).siblings().hide();
+      }
+      window.scrollTo({top: 0, behavior: 'smooth'});
+      
+      //$('.autocomplete').focus();
+      if($(document.body).hasClass('no-search-results')) {
+        $(document.body).removeClass('no-search-results');
+      }
+      // this.vueGlobal.searchText = $('.header-area__search-field').value;
+      this.updateSearch();
+
     });
 
     this.setupStickerImageLoading();

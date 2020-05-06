@@ -29,15 +29,15 @@ import * as util from './util';
 import * as handler from './handler';
 
 export function onShowStickers(context) {
-	// handler.init(context);
+	handler.init(context);
 	let window = new StickersUI(context);
 	window.showHide();
 	handler.trackEvent("Stickers", "onShowHideStickers", 1);
 }
 
 export function onClearCache(context) {
-	// handler.init(context);
-  util.rmdirRecursive(util.getPluginCachePath());
-  context.document.showMessage(`✅ Symbol index cleared`);
-  handler.trackEvent("Stickers", "onClearCache", 1);
+	handler.init(context);
+	util.rmdirRecursive(util.getPluginCachePath());
+	context.document.showMessage(`✅ Symbol index cleared`);
+	handler.trackEvent("Stickers", "onClearCache", 1);
 }

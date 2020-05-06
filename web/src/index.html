@@ -15,7 +15,8 @@ input,textarea {
 }
 
 html {
-    cursor: default
+    cursor: default;
+    scroll-behavior: smooth;
 }
 
 .svg-icon {
@@ -46,6 +47,42 @@ html {
     font-style: normal;
     font-weight: 500;
     color: var(--theme-color-fg-primary)
+}
+
+.zero-state__text.processing-msg {
+    position: relative;
+    width: 100%;
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+
+.zero-state__text.processing-msg div {
+    position: absolute;
+    width: 100%;
+    transition: all 1s linear;
+    animation-name: fade;
+        animation-duration: 8s;
+        animation-iteration-count: infinite;
+        animation-fill-mode: both;
+}
+
+@keyframes fade {
+    0%,50% {
+        opacity: 0;
+        display: none;
+    }
+    100% {
+        opacity: 1;
+        display: block;
+    }
+}
+
+.zero-state__text.processing-msg .one {
+    animation-direction: alternate-reverse;
+}
+
+.zero-state__text.processing-msg .two {
+    animation-direction: alternate;
 }
 
 .zero-state__link {
@@ -84,6 +121,10 @@ html {
     display: none!important
 }
 
+body.no-search-results .sticker-library-container {
+    display: none !important;
+}
+
 body,html {
     height: 100%;
     margin: 0;
@@ -104,12 +145,39 @@ body {
     --side-margin:36px;--left-keyline:316px;--root-section-vert-padding:40px}
 
 body[is-dark-theme] {
-    --theme-color-bg:#202124;--theme-color-bg-level-2:#2e3034;--theme-color-bg-level-3:#383a3f;--theme-color-bg-floating-header:rgba(32,33,36,.75);--theme-color-fg-primary:#fff;--theme-color-fg-secondary:hsla(0,0%,100%,.7);--theme-color-fg-tertiary:hsla(0,0%,100%,.5);--theme-color-thin-border:hsla(0,0%,100%,.2);--theme-color-accent:#536dfe;--theme-color-button:#8698fe;--theme-color-button-hover:#9faefe;--theme-color-button-active:#b8c3ff;--theme-color-button-fg:#000;--theme-color-search:hsla(0,0%,100%,.2);--theme-color-search-active:hsla(0,0%,100%,.3);--theme-color-search-highlight:#f29900;--theme-gradient-fade-to-bg:linear-gradient(90deg,#202124 0%,rgba(32,33,36,.9) 30%,rgba(32,33,36,.67) 60%,rgba(32,33,36,.5) 75%,rgba(32,33,36,.33) 85%,rgba(32,33,36,0))}
+    --theme-color-bg:#202124;--theme-color-bg-level-2:#2e3034;--theme-color-bg-level-3:#383a3f;--theme-color-bg-floating-header:rgba(32,33,36,.75);--theme-color-fg-primary:#fff;--theme-color-fg-secondary:hsla(0,0%,100%,.7);--theme-color-fg-tertiary:hsla(0,0%,100%,.5);--theme-color-thin-border:hsla(0,0%,100%,.2);--theme-color-accent:#536dfe;--theme-color-button:#8698fe;--theme-color-button-hover:#9faefe;--theme-color-button-active:#b8c3ff;--theme-color-button-fg:#000;--theme-color-search:hsla(0,0%,100%,.2);--theme-color-search-active:hsla(0,0%,100%,.3);--theme-color-search-highlight:#f29900;--theme-gradient-fade-to-bg:linear-gradient(90deg,#202124 0%,rgba(32,33,36,.9) 30%,rgba(32,33,36,.67) 60%,rgba(32,33,36,.5) 75%,rgba(32,33,36,.33) 85%,rgba(32,33,36,0));}
 
-@media only screen and (max-width: 800px) {
+/*@media only screen and (max-width: 800px) {
     body[ui-mode=palette] {
         --side-margin:20px;
-        --left-keyline:256px}
+        --left-keyline:256px;
+    }
+}*/
+
+@media only screen and (max-width: 960px) {
+    body{
+        --side-margin:16px;
+        --left-keyline:256px;
+    }
+    .header-area {
+        grid-template-columns: calc(32px + var(--side-margin)) 1fr auto !important;
+    }
+    .header-area__back-button {
+        width: 32px !important;
+        background-size: cover !important;
+    }
+    .header-area__search-field-container {
+        max-width: none !important;
+    }
+}
+
+@media only screen and (max-width: 440px) {
+    body{
+        --side-margin:16px;
+    }
+    .header-area .actions {
+        display: none !important;
+    }
 }
 
 .root {
@@ -151,7 +219,15 @@ body[is-dark-theme] {
     background-color: transparent;
     outline: none;
     font-size: 14px;
-    line-height: 20px
+    line-height: 20px;
+
+    background: url('./logo-light.svg') no-repeat;
+    height: 32px;
+    width: 171px;
+    margin: 0;
+}
+body[is-dark-theme] .header-area__back-button {
+    background: url('./logo-dark.svg') no-repeat;
 }
 
 [ui-mode=palette] .header-area__back-button {
@@ -172,9 +248,10 @@ body[is-dark-theme] {
 .header-area__search-field-container {
     position: relative;
     height: 32px;
+    /*justify-self: center;*/
     justify-self: flex-start;
     width: 100%;
-    max-width: 320px;
+    /*max-width: 320px;*/
     margin-right: var(--side-margin)
 }
 
@@ -217,11 +294,52 @@ body[is-dark-theme] {
     color: var(--theme-color-fg-secondary)
 }
 
+.navigation-area {
+    position: fixed;
+    left: 0;
+    top: 48px;
+    right: 0;
+    height: 48px;
+    z-index: 8;
+    box-shadow: 0 1px 0 var(--theme-color-thin-border);
+    background: var(--theme-color-bg-floating-header);
+}
+
+.navigation-area .library-tabs {
+    overflow: auto;
+    white-space: nowrap;
+    overflow-x: auto;
+    padding: 0px var(--side-margin);
+}
+
+.navigation-area .library-tabs .library-tab {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-right: 16px;
+    text-decoration: none;
+    font-size: 16px;
+    line-height: 28px;
+    font-weight: bold;
+    color: var(--theme-color-fg-secondary);
+    box-shadow: none;
+    cursor: pointer;
+}
+
+.navigation-area .library-tabs .library-tab:hover {
+    color: var(--theme-color-fg-primary);
+    box-shadow: inset 0 -3px 0 0 var(--theme-color-fg-secondary);
+}
+
+.navigation-area .library-tabs .library-tab.active, .navigation-area .library-tabs .library-tab.active:hover {
+    color: var(--theme-color-button);
+    box-shadow: inset 0 -3px 0 0 var(--theme-color-button);
+}
+
 .stickers-area {
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
-    padding-top: 48px
+    padding-top: 96px
 }
 
 .sticker-library-header {
@@ -375,7 +493,7 @@ body[is-dark-theme] {
     align-self: flex-start;
     position: sticky;
     position: -webkit-sticky;
-    top: calc(var(--root-section-vert-padding) + 48px);
+    top: calc(var(--root-section-vert-padding) + 72px);
     box-sizing: border-box;
     display: flex;
     flex: 0 0 auto;
@@ -394,10 +512,12 @@ body[is-dark-theme] {
 .sticker-root-section__overline {
     font-size: 10px;
     line-height: 16px;
-    color: var(--theme-color-fg-tertiary);
+    /*color: var(--theme-color-fg-tertiary);*/
     white-space: nowrap;
     text-overflow: ellipsis;
-    overflow: hidden
+    overflow: hidden;
+    color: var(--theme-color-accent);
+    font-weight: bold;
 }
 
 .sticker-root-section__title {
@@ -419,8 +539,66 @@ body[is-dark-theme] {
     margin-bottom: 16px;
 }
 
+.sticker-root-section__whatsnew_link, .sticker-root-section__update_link {
+    margin: 0 var(--side-margin);
+    font-weight: bold;
+    /*background: var(--theme-color-button) url('./newbg.png');*/
+    background: var(--theme-color-fg-primary) url('./newbg.png');
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -webkit-animation: stripes 60s linear infinite;
+    -webkit-transform: translate3d(0,0,0);  
+    -webkit-backface-visibility: hidden;
+}
+
+.sticker-root-section__whatsnew_link:hover, .sticker-root-section__update_link:hover {
+    border-bottom: 1px dashed var(--theme-color-button);
+}
+
+.sticker-root-section__update_link {
+    background: #F34676 url('./newbg.png');
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: none;
+}
+
+body.hasUpdates .sticker-root-section__whatsnew_link {
+    display: none;
+}
+
+body.hasUpdates .sticker-root-section__update_link {
+    display: inline-block;
+    -webkit-animation: stripes 60s linear infinite, shake-animation 4.72s ease infinite;
+    transform-origin: 50% 50%;
+}
+
+@keyframes shake-animation {
+   0% { transform:translate(0,0) }
+  1.78571% { transform:translate(5px,0) }
+  3.57143% { transform:translate(0,0) }
+  5.35714% { transform:translate(5px,0) }
+  7.14286% { transform:translate(0,0) }
+  8.92857% { transform:translate(5px,0) }
+  10.71429% { transform:translate(0,0) }
+  100% { transform:translate(0,0) }
+}
+
+@-webkit-keyframes stripes {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+}
+
+@keyframes stripes {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+}
+
+
 .sticker-root-section__link {
-    --color:var(--theme-color-button);display: flex;
+    --color:var(--theme-color-button);
+    /*display: flex;*/
     align-items: center;
     color: var(--color);
     font-weight: 500;
@@ -567,7 +745,9 @@ body[is-dark-theme] {
     cursor: pointer;
     background-color: transparent;
     transition: transform .1s ease,opacity .1s ease;
-    opacity: 1
+    opacity: 1;
+    min-width: 24px;
+    min-height: 24px;
 }
 
 .sticker__thumb:hover {
@@ -956,7 +1136,7 @@ body[is-dark-theme] .page-loading .zero-state__image {
   justify-content: center;
   margin-top: 80px;
 }
-.element:after {
+.element::after {
   -webkit-animation: changeLetter 2s linear infinite alternate;
           animation: changeLetter 2s linear infinite alternate;
   display: block;
@@ -980,14 +1160,31 @@ body[is-dark-theme] .page-loading .zero-state__image {
   }
 }
 
+
+body.hide-navigation .navigation-area {
+    display: none;
+}
+
+body.hide-navigation .navigation-area {
+}
+
+body.hide-navigation .stickers-area {
+    padding-top: 48px;
+}
+
+body.hide-navigation .sticker-root-section__meta {
+    top: calc(var(--root-section-vert-padding) + 72px - 48px);
+}
+
   </style>
 </head>
 <body>
   <div class="root" v-cloak>
     <div class="header-area">
-      <button class="header-area__back-button" v-on:click="closeWindow">
-        <svg-icon glyph="arrow_back_ios"></svg-icon>
-        <span>Back to Sketch</span>
+      <button class="header-area__back-button">
+        
+        <!-- <svg-icon glyph="arrow_back_ios"></svg-icon>
+        <span>Back to Sketch</span> -->
       </button>
       <div class="header-area__search-field-container" v-if="stickerIndex">
         <svg-icon glyph="search"></svg-icon>
@@ -998,7 +1195,7 @@ body[is-dark-theme] .page-loading .zero-state__image {
             v-on:input="onSearchInput($event)"
             autocorrect="off"
             spellcheck="false"
-            placeholder="Search.."
+            placeholder="Hit TAB to Search..."
             list="searchHistory">
                 <datalist id="searchHistory">
                   <!-- <option value="HTML">
@@ -1016,15 +1213,39 @@ body[is-dark-theme] .page-loading .zero-state__image {
                 </datalist>
             <!-- <input id="log" class="header-area__search-field" v-if="stickerIndex" style="margin-left: 350px;"> -->
       </div>
-      <div v-if="stickerIndex"><a class="sticker-root-section__link" 
-        href="http://symbol-browser.pratikshah.website/#faq"
-        style="margin-top: 0;">FAQs</a></div>
+      <div class="actions" v-if="stickerIndex">
+            <a class="sticker-root-section__whatsnew_link" 
+            href="http://symbol-browser.pratikshah.website/#features" title="What's new in v3.5.1?" 
+            style="margin-top: 0;">What's new?</a>
+            <a class="sticker-root-section__update_link" 
+            href="https://github.com/pratikjshah/symbol-browser/releases/latest/download/symbol-browser.sketchplugin.zip"
+            style="margin-top: 0;">Update Plugin</a>
+            <a class="sticker-root-section__link" 
+            href="http://symbol-browser.pratikshah.website/#faq"
+            style="margin-top: 0;">FAQs</a>
+        </div>
+    </div>
+
+    <div class="navigation-area" v-if="stickerIndex && stickerIndex.libraries.length > 0">
+        <div class="library-tabs">
+            <div class="library-tab active"
+                data-key="all">
+                All
+            </div>
+            <div class="library-tab"
+                v-for="library in stickerIndex.libraries"
+                :data-key="library.id"
+                :key="library.id">
+                {{ library.title }}
+            </div>
+      </div>
     </div>
 
     <div class="stickers-area" v-if="stickerIndex">
       <div v-for="library in stickerIndex.libraries"
           v-if="!library._hide"
           class="sticker-library-container"
+          :id="library.id"
           :key="library.id">
         <div class="sticker-library-header">
           <div class="sticker-library-header__icon" v-if="library.iconPath"
@@ -1103,10 +1324,10 @@ body[is-dark-theme] .page-loading .zero-state__image {
         </span>
         <a class="zero-state__link" href="https://www.sketch.com/docs/libraries/adding-libraries">Learn more</a>
       </div>
-      <div class="zero-state search-empty" v-if="$globals.searchText">
+      <div class="zero-state search-empty" v-if="$globals.searchText && !$globals.anyResults">
         <div class="zero-state__image"><div class="element"></div></div>
         <span class="zero-state__text">
-          No symbols or categories matched <em>'{{ $globals.searchText }}'</em>
+          No symbols or categories matched for <em>'{{ $globals.searchText }}'</em>
         </span>
       </div>
     </div>
@@ -1129,10 +1350,13 @@ body[is-dark-theme] .page-loading .zero-state__image {
             </div>
         </div>
       </div>
-      <span class="zero-state__text">
+      <div class="zero-state__text">
         Indexing Library Symbols&hellip; 
-        <br/> <span style="font-size: 12px;">(this might take a minute)</span>
-      </span>
+      </div>
+      <div class="zero-state__text processing-msg">
+        <div style="font-size: 12px;" class="one">This might take a minute or two based on your library size</div>
+        <div style="font-size: 12px;" class="two">Don't worry this is a one-time activity</div>
+      </div>
       <div class="page-loading__progressbar">
         <div class="page-loading__progress"
             v-bind:style="{'transform':'scaleX(' + indexLoadProgress + ')'}"></div>
