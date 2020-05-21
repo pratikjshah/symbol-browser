@@ -6,6 +6,19 @@
         <description>Better way to browse your Design System and UI Sticker sheet</description>
         <language>en</language>
         <item>
+            <title>v3.5.2</title>
+            <description>
+                <![CDATA[
+                  <h2>Fix for Sketch 66</h2>
+                ]]>
+            </description>
+            <pubDate>Thu, 21 May 2020 2:54:24 GMT</pubDate>
+            <enclosure
+                url="https://github.com/pratikjshah/symbol-browser/archive/v3.5.2.zip"
+                sparkle:version="3.5.2"
+                type="application/octet-stream"/>
+        </item>
+        <item>
             <title>v3.5.1</title>
             <description>
                 <![CDATA[
