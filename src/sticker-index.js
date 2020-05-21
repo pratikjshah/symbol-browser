@@ -29,7 +29,7 @@ import * as util from './util';
 import * as colorUtil from './color-util';
 import {ProgressReporter} from './util-progress-reporter';
 
-const INDEX_FORMAT_VERSION = 6;
+const INDEX_FORMAT_VERSION = 7;
 const FORCE_REBULD = false;
 const SHOW_DEFAULT_STICKERS = true;
 let _defaultSection = 'DefaultSymbols';
@@ -213,11 +213,17 @@ async function buildStickerIndexForLibrary(libraryId, defaultLibName, document, 
       NSPredicate.predicateWithFormat('className == %@', 'MSTextLayer'));
   allTextLayers.reverse(); // layer list order, not stacking order
 
-  log("allTextLayers: " + allTextLayers.length);
+  // log("allTextLayers: " + allTextLayers.length);
   let combinedText = "";
   for (let textLayer of allTextLayers) {
     let text = textLayer.stringValue();
     if (text.indexOf('!Sticker') < 0) {
+      continue;
+    }
+
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if(re.test(String(text).toLowerCase())) {
+      log("Skip Email textLayer: " + text);
       continue;
     }
 
@@ -317,6 +323,12 @@ async function buildStickerIndexForLibrary(libraryId, defaultLibName, document, 
     progressReporter.increment();
     if (layer instanceof MSTextLayer && String(layer.name()).startsWith('!Sticker')) {
       // for text layers containing actual metadata, don't treat it as a sticker
+      continue;
+    }
+
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if(layer instanceof MSTextLayer && re.test(String(layer.name()).toLowerCase())) {
+      // log("Skip Email text layer Name: " + layer.name());
       continue;
     }
 
@@ -501,8 +513,20 @@ const SPECIAL_INSTRUCTIONS = new Set(['icon']);
 //   return parsed;
 // }
 
+function sanatizedEmailName(name) {
+  var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  if(re.test(String(name).toLowerCase())) {
+    name = name.replace("@","");
+    name = name.replace(".","");
+  }
+  return name;
+}
+
 function getSymbolNameWithSectionFn(name) {
   var init, last, newName;
+
+  name = sanatizedEmailName(name);
+
   name = name.replace(/[^a-zA-Z0-9 \/_]/g, '');
   if(name.lastIndexOf("/") > 0) {
     init = (name.substring(0, name.lastIndexOf("/") + 0)).replace(/\s\s+/g, ' ').replace(/\//g,'_').replace(/\s/g,'');
@@ -512,7 +536,7 @@ function getSymbolNameWithSectionFn(name) {
     last = name;
   }
 
-  newName = name + "@" + _defaultSection + "." + init;
+  newName = name + " @" + _defaultSection + "." + init;
 
   return newName;
 }
@@ -526,12 +550,19 @@ function parseLayerName(name, isValidSectionIdFn) {
   };
 
   name = String(name || '');
+  var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
   if(!name.includes("@")) {
     name = getSymbolNameWithSectionFn(name);
+    // log("Ideal symbol Name: " + name);
+  } else if(re.test(String(name).toLowerCase())) {
+    name = getSymbolNameWithSectionFn(sanatizedEmailName(name));
+    // log("sanatizedEmailName Name: " + name + "   |    new: " + name);
   } else {
-    log(name);
+    log("Exception/tagged Name: " + name);
   }
+
+  // log(name);
 
   let unspecialParts = name
       .split(/(@+[\w\.]+)/)
@@ -571,7 +602,7 @@ function getStickersMetadata(stickersMetaData) {
   var sectionPrefix = '!StickerSection ';
   var title = 'title: ';
   var hideNames = 'hideNames: false';
-  var description = 'description: All of your symbols show up here. Symbol Browser will arrange all of your symbols in a groups based on the names. <br/><br/><br/><b>Want to define your own groupings?</b><br/> Follow below link to see how to define new sections. <br/><br/> <a class="sticker-root-section__link" href="https://github.com/pratikjshah/symbol-browser/wiki/Create-custom-sections-for-Symbols" style="text-alignn:center;">View Documentation</a>';
+  var description = 'description: All of your symbols show up here. Symbol Browser will arrange all of your symbols in a groups based on the names. <br/><br/><br/><b>Want to define your own groupings?</b><br/> Follow below link to see how to define new sections. <br/><br/> <a class="sticker-root-section__link" href="https://github.com/pratikjshah/symbol-browser/wiki/Create-custom-sections-for-Symbols">View Documentation</a>';
   var backgroundEach = "backgroundEach: '#ffffff'";
   var layout = 'layout: row';
   var yamlStickersMetadata = '';
